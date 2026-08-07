@@ -32,6 +32,7 @@ export type GameAction =
   | { type: "ENTER" }
   | { type: "START" }
   | { type: "COUNTDOWN_COMPLETE" }
+  | { type: "DISPLAY_KEYCHAIN"; keychainId: string }
   | { type: "STOP"; winnerId: string }
   | { type: "DECELERATION_COMPLETE" }
   | { type: "REVEAL_COMPLETE" }

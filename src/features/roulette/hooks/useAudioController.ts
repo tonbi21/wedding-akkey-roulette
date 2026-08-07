@@ -28,9 +28,24 @@ type TrackName = "waiting" | "roulette" | "deceleration" | "winner";
 type AudioSources = Record<TrackName, string>;
 type AudioFactory = (source: string) => AudioElementLike;
 
+const defaultAudioFactory: AudioFactory = (source) => {
+  if (typeof Audio === "function") return new Audio(source);
+  return {
+    src: source,
+    currentTime: 0,
+    loop: false,
+    muted: false,
+    paused: true,
+    volume: 1,
+    load: () => undefined,
+    pause: () => undefined,
+    play: async () => undefined
+  };
+};
+
 export function createAudioController(
   sources: AudioSources,
-  factory: AudioFactory = (source) => new Audio(source)
+  factory: AudioFactory = defaultAudioFactory
 ): AudioController {
   const tracks = Object.fromEntries(
     Object.entries(sources).map(([name, source]) => [name, factory(source)])

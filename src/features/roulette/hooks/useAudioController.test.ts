@@ -16,6 +16,17 @@ const createFakeAudio = () => {
 };
 
 describe("createAudioController", () => {
+  it("can be created during server rendering without Audio", () => {
+    vi.stubGlobal("Audio", undefined);
+    expect(() => createAudioController({
+      waiting: "/waiting.mp3",
+      roulette: "/roulette.mp3",
+      deceleration: "/deceleration.mp3",
+      winner: "/winner.mp3"
+    })).not.toThrow();
+    vi.unstubAllGlobals();
+  });
+
   it("unlocks audio and starts/stops the expected tracks", async () => {
     const audios = new Map<string, AudioElementLike>();
     const controller = createAudioController(

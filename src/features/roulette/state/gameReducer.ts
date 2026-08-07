@@ -59,6 +59,13 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         phase: "spinning"
       };
 
+    case "DISPLAY_KEYCHAIN":
+      if (state.phase !== "spinning" && state.phase !== "decelerating") {
+        return state;
+      }
+
+      return { ...state, currentKeychainId: action.keychainId };
+
     case "STOP":
       if (state.phase !== "spinning" || state.pendingWinnerId !== null) {
         return state;

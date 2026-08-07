@@ -59,6 +59,14 @@ describe("gameReducer", () => {
     expect(nextState.pendingWinnerId).toBe("keychain-02");
   });
 
+  it("updates the visible keychain while spinning without changing the phase", () => {
+    const state = createState({ phase: "spinning", assetsReady: true });
+    expect(gameReducer(state, { type: "DISPLAY_KEYCHAIN", keychainId: "keychain-04" })).toEqual({
+      ...state,
+      currentKeychainId: "keychain-04"
+    });
+  });
+
   it("ignores stop outside spinning and ignores a second stop once pending winner exists", () => {
     const idleState = createState({ phase: "idle", assetsReady: true });
     const stoppedState = gameReducer(createState({ phase: "spinning", assetsReady: true }), {

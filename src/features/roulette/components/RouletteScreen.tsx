@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { KEYCHAINS } from "../keychains";
 import { type AssetLoadState } from "../lib/assets";
 import { AUDIO_ASSETS } from "../lib/assets";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import { useAudioController, type AudioController } from "../hooks/useAudioController";
+import { useRouletteAnimation } from "../hooks/useRouletteAnimation";
 import type { GameAction, GameState, Keychain } from "../gameTypes";
 import { gameReducer, initialGameState } from "../state/gameReducer";
 import { CountdownOverlay } from "./CountdownOverlay";
@@ -55,9 +56,11 @@ export function RouletteScreen({
   const [state, setState] = useState<GameState>(initialState ?? initialGameState);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const dispatch = (action: GameAction) => {
+  const dispatch = useCallback((action: GameAction) => {
     setState((currentState) => gameReducer(currentState, action));
-  };
+  }, []);
+
+  useRouletteAnimation({ dispatch, state });
 
   useEffect(() => {
     if (initialState) {
@@ -87,21 +90,7 @@ export function RouletteScreen({
 
     const timer = window.setTimeout(() => {
       dispatch({ type: "COUNTDOWN_COMPLETE" });
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [state.phase]);
-
-  useEffect(() => {
-    if (state.phase !== "decelerating") {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      dispatch({ type: "DECELERATION_COMPLETE" });
-    }, 0);
+    }, 2600);
 
     return () => {
       window.clearTimeout(timer);
@@ -115,7 +104,7 @@ export function RouletteScreen({
 
     const timer = window.setTimeout(() => {
       dispatch({ type: "REVEAL_COMPLETE" });
-    }, 0);
+    }, 1000);
 
     return () => {
       window.clearTimeout(timer);
@@ -126,35 +115,39 @@ export function RouletteScreen({
   const historyKeychains = useMemo(() => getHistoryKeychains(state.winnerIds), [state.winnerIds]);
 
   const handleEnter = async () => {
+    if (state.phase !== "ready") return;
+    dispatch({ type: "ENTER" });
     await activeAudioController.unlock();
     await activeAudioController.startWaiting();
-    dispatch({ type: "ENTER" });
   };
 
   const handleStart = async () => {
+    if (state.phase !== "idle") return;
+    dispatch({ type: "START" });
     await activeAudioController.stopWaiting();
     await activeAudioController.startRoulette();
-    dispatch({ type: "START" });
   };
 
   const handleStop = async () => {
+    if (state.phase !== "spinning") return;
     const availableIds = KEYCHAINS
       .map((keychain) => keychain.id)
       .filter((keychainId) => !state.winnerIds.includes(keychainId));
     const winnerId = resolveWinnerId(availableIds, state);
 
-    await activeAudioController.startDeceleration();
     dispatch({ type: "STOP", winnerId });
+    await activeAudioController.startDeceleration();
   };
 
   const handleNext = async () => {
+    if (state.phase !== "winner") return;
+    dispatch({ type: "NEXT" });
     if (state.round === 3) {
       await activeAudioController.playWinner();
     } else {
       await activeAudioController.startWaiting();
     }
 
-    dispatch({ type: "NEXT" });
   };
 
   return (
