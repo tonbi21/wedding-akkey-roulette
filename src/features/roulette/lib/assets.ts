@@ -1,7 +1,7 @@
 import { KEYCHAINS } from "../keychains";
 
 export const IMAGE_ASSETS = KEYCHAINS.map((keychain) => keychain.imageSrc);
-const AUDIO_ASSET_VERSION = "v3";
+const AUDIO_ASSET_VERSION = "v4";
 export const AUDIO_ASSETS = {
   waiting: `/audio/waiting.mp3?${AUDIO_ASSET_VERSION}`,
   roulette: `/audio/roulette.mp3?${AUDIO_ASSET_VERSION}`,

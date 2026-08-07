@@ -75,19 +75,6 @@ export function createAudioController(
 
   return {
     unlock() {
-      for (const track of Object.values(tracks)) {
-        const muted = track.muted;
-        track.muted = true;
-        track.load();
-        try {
-          void Promise.resolve(track.play()).catch(() => undefined);
-        } catch {
-          // Autoplay remains blocked until a later gesture.
-        }
-        track.pause();
-        track.currentTime = 0;
-        track.muted = muted;
-      }
       return Promise.resolve();
     },
     startWaiting: () => play("waiting", true),
@@ -95,11 +82,7 @@ export function createAudioController(
     startRoulette: () => play("roulette"),
     startDeceleration: () => play("deceleration"),
     playWinner: () => play("winner"),
-    stopAll: () => Object.values(tracks).forEach((track) => {
-      stop(track);
-      track.src = "";
-      track.load();
-    })
+    stopAll: () => Object.values(tracks).forEach(stop)
   };
 }
 

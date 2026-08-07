@@ -44,6 +44,7 @@ describe("createAudioController", () => {
 
   it("stops and resets every audio element", () => {
     const audio = createFakeAudio();
+    audio.src = "/winner.mp3";
     const controller = createAudioController(
       { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
       () => audio
@@ -53,8 +54,8 @@ describe("createAudioController", () => {
 
     expect(audio.pause).toHaveBeenCalled();
     expect(audio.currentTime).toBe(0);
-    expect(audio.src).toBe("");
-    expect(audio.load).toHaveBeenCalled();
+    expect(audio.src).toBe("/winner.mp3");
+    expect(audio.load).not.toHaveBeenCalled();
   });
 
   it("does not reject when a browser cannot play an audio source", async () => {
@@ -89,5 +90,18 @@ describe("createAudioController", () => {
     await unlock;
 
     expect(audios.get("/waiting.mp3")?.paused).toBe(false);
+  });
+
+  it("does not reload audio elements while unlocking audio", async () => {
+    const audio = createFakeAudio();
+    const controller = createAudioController(
+      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      () => audio
+    );
+
+    await controller.unlock();
+
+    expect(audio.play).not.toHaveBeenCalled();
+    expect(audio.load).not.toHaveBeenCalled();
   });
 });
