@@ -18,35 +18,72 @@ type LoadableAsset = {
   src: string;
   decode?: () => Promise<void>;
   load?: () => void;
+  addEventListener?: (type: "loadeddata" | "error", listener: () => void) => void;
+  removeEventListener?: (type: "loadeddata" | "error", listener: () => void) => void;
 };
 type AssetFactory = (src: string) => LoadableAsset;
 
 const loadOne = async (source: string, factory: AssetFactory): Promise<void> => {
   const asset = factory(source);
   asset.src = source;
+  if (asset.decode) {
+    asset.load?.();
+    await asset.decode();
+    return;
+  }
+
+  if (asset.addEventListener && asset.removeEventListener) {
+    const addEventListener = asset.addEventListener.bind(asset);
+    const removeEventListener = asset.removeEventListener.bind(asset);
+    await new Promise<void>((resolve, reject) => {
+      const loaded = () => {
+        removeEventListener("loadeddata", loaded);
+        removeEventListener("error", failed);
+        resolve();
+      };
+      const failed = () => {
+        removeEventListener("loadeddata", loaded);
+        removeEventListener("error", failed);
+        reject(new Error(`Failed to load ${source}`));
+      };
+      addEventListener("loadeddata", loaded);
+      addEventListener("error", failed);
+      asset.load?.();
+    });
+    return;
+  }
+
   asset.load?.();
-  await asset.decode?.();
 };
 
 export async function preloadAssets(
   imageSources: string[],
   audioSources: string[],
   imageFactory: AssetFactory = (source) => new Image() as unknown as LoadableAsset,
-  audioFactory: AssetFactory = (source) => new Audio(source)
+  audioFactory: AssetFactory = (source) => new Audio(source),
+  onProgress?: (state: AssetLoadState) => void
 ): Promise<AssetLoadState> {
   const sources = [...imageSources, ...audioSources];
+  let completed = 0;
+  const failedAssets: string[] = [];
+  const reportProgress = () => onProgress?.({
+    ready: completed === sources.length && failedAssets.length === 0,
+    progress: sources.length === 0 ? 0 : Math.round((completed / sources.length) * 100),
+    failedAssets: [...failedAssets]
+  });
   const results = await Promise.all(
     sources.map(async (source, index) => {
       const factory = index < imageSources.length ? imageFactory : audioFactory;
       try {
         await loadOne(source, factory);
-        return null;
       } catch {
-        return source;
+        failedAssets.push(source);
       }
+      completed += 1;
+      reportProgress();
     })
   );
-  const failedAssets = results.filter((source): source is string => source !== null);
+  void results;
   return {
     ready: sources.length > 0 && failedAssets.length === 0,
     progress: failedAssets.length === 0 ? 100 : Math.round(((sources.length - failedAssets.length) / sources.length) * 100),

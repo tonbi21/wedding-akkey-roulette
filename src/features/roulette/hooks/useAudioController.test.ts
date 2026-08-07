@@ -42,5 +42,7 @@ describe("createAudioController", () => {
 
     expect(audio.pause).toHaveBeenCalled();
     expect(audio.currentTime).toBe(0);
+    expect(audio.src).toBe("");
+    expect(audio.load).toHaveBeenCalled();
   });
 });

@@ -16,6 +16,15 @@ const factory = (failures: Set<string> = new Set()) => (src: string): FakeAsset 
 });
 
 describe("preloadAssets", () => {
+  it("reports progress after each asset settles", async () => {
+    const progress: number[] = [];
+    await preloadAssets(["image-a"], ["audio-a"], factory(), factory(), (state) => {
+      progress.push(state.progress);
+    });
+
+    expect(progress).toEqual([50, 100]);
+  });
+
   it("reports ready after every image and audio asset is decoded", async () => {
     await expect(preloadAssets(["image-a", "image-b"], ["audio-a"], factory(), factory()))
       .resolves.toEqual({ ready: true, progress: 100, failedAssets: [] });

@@ -67,7 +67,11 @@ export function createAudioController(
     startRoulette: () => play("roulette"),
     startDeceleration: () => play("deceleration"),
     playWinner: () => play("winner"),
-    stopAll: () => Object.values(tracks).forEach(stop)
+    stopAll: () => Object.values(tracks).forEach((track) => {
+      stop(track);
+      track.src = "";
+      track.load();
+    })
   };
 }
 

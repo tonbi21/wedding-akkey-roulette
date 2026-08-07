@@ -10,7 +10,9 @@ export function useAssetPreloader(): AssetLoadState {
 
   useEffect(() => {
     let active = true;
-    void preloadAssets(IMAGE_ASSETS, Object.values(AUDIO_ASSETS)).then((nextState) => {
+    void preloadAssets(IMAGE_ASSETS, Object.values(AUDIO_ASSETS), undefined, undefined, (progressState) => {
+      if (active) setState(progressState);
+    }).then((nextState) => {
       if (active) setState(nextState);
     });
     return () => { active = false; };
