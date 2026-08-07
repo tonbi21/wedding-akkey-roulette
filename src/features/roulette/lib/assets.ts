@@ -86,7 +86,7 @@ export async function preloadAssets(
   void results;
   return {
     ready: sources.length > 0 && failedAssets.length === 0,
-    progress: failedAssets.length === 0 ? 100 : Math.round(((sources.length - failedAssets.length) / sources.length) * 100),
+    progress: sources.length === 0 ? 0 : 100,
     failedAssets
   };
 }

@@ -33,6 +33,6 @@ describe("preloadAssets", () => {
   it("reports every failed required asset and does not become ready", async () => {
     await expect(
       preloadAssets(["image-a"], ["audio-a"], factory(new Set(["image-a"])), factory(new Set(["audio-a"])))
-    ).resolves.toEqual({ ready: false, progress: 0, failedAssets: ["image-a", "audio-a"] });
+    ).resolves.toEqual({ ready: false, progress: 100, failedAssets: ["image-a", "audio-a"] });
   });
 });
