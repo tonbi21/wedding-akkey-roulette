@@ -62,7 +62,11 @@ export function createAudioController(
     });
     const track = tracks[name];
     track.loop = loop;
-    await track.play();
+    try {
+      await track.play();
+    } catch {
+      // Audio is optional; an unsupported or blocked source must not stop the draw.
+    }
   };
 
   return {

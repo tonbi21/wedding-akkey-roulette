@@ -56,4 +56,17 @@ describe("createAudioController", () => {
     expect(audio.src).toBe("");
     expect(audio.load).toHaveBeenCalled();
   });
+
+  it("does not reject when a browser cannot play an audio source", async () => {
+    const audio = createFakeAudio();
+    audio.play = vi.fn(async () => {
+      throw new DOMException("The element has no supported sources.", "NotSupportedError");
+    });
+    const controller = createAudioController(
+      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      () => audio
+    );
+
+    await expect(controller.startRoulette()).resolves.toBeUndefined();
+  });
 });
