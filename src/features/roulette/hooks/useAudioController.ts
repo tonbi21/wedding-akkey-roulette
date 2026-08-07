@@ -70,16 +70,21 @@ export function createAudioController(
   };
 
   return {
-    async unlock() {
+    unlock() {
       for (const track of Object.values(tracks)) {
         const muted = track.muted;
         track.muted = true;
         track.load();
-        try { await track.play(); } catch { /* autoplay remains blocked until a later gesture */ }
+        try {
+          void Promise.resolve(track.play()).catch(() => undefined);
+        } catch {
+          // Autoplay remains blocked until a later gesture.
+        }
         track.pause();
         track.currentTime = 0;
         track.muted = muted;
       }
+      return Promise.resolve();
     },
     startWaiting: () => play("waiting", true),
     stopWaiting: async () => { stop(tracks.waiting); },

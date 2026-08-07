@@ -69,4 +69,22 @@ describe("createAudioController", () => {
 
     await expect(controller.startRoulette()).resolves.toBeUndefined();
   });
+
+  it("keeps waiting audio playing when it starts during the unlock gesture", async () => {
+    const audios = new Map<string, AudioElementLike>();
+    const controller = createAudioController(
+      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      (src) => {
+        const audio = createFakeAudio();
+        audios.set(src, audio);
+        return audio;
+      }
+    );
+
+    const unlock = controller.unlock();
+    await controller.startWaiting();
+    await unlock;
+
+    expect(audios.get("/waiting.mp3")?.paused).toBe(false);
+  });
 });

@@ -161,21 +161,21 @@ export function RouletteScreen({
   const visibleKeychain = useMemo(() => getVisibleKeychain(state), [state]);
   const historyKeychains = useMemo(() => getHistoryKeychains(state.winnerIds), [state.winnerIds]);
 
-  const handleEnter = async () => {
+  const handleEnter = () => {
     if (state.phase !== "ready") return;
     dispatch({ type: "ENTER" });
-    await activeAudioController.unlock();
-    await activeAudioController.startWaiting();
+    void activeAudioController.unlock();
+    void activeAudioController.startWaiting();
   };
 
-  const handleStart = async () => {
+  const handleStart = () => {
     if (state.phase !== "idle") return;
     dispatch({ type: "START" });
-    await activeAudioController.stopWaiting();
-    await activeAudioController.startRoulette();
+    void activeAudioController.stopWaiting();
+    void activeAudioController.startRoulette();
   };
 
-  const handleStop = async () => {
+  const handleStop = () => {
     if (state.phase !== "spinning") return;
     const availableIds = KEYCHAINS
       .map((keychain) => keychain.id)
@@ -183,16 +183,16 @@ export function RouletteScreen({
     const winnerId = resolveWinnerId(availableIds, state);
 
     dispatch({ type: "STOP", winnerId });
-    await activeAudioController.startDeceleration();
+    void activeAudioController.startDeceleration();
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (state.phase !== "winner") return;
     dispatch({ type: "NEXT" });
     if (state.round === 3) {
-      await activeAudioController.playWinner();
+      void activeAudioController.playWinner();
     } else {
-      await activeAudioController.startWaiting();
+      void activeAudioController.startWaiting();
     }
 
   };
