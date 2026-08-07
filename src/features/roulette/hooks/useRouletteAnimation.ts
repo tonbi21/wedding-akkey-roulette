@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { KEYCHAINS } from "../keychains";
 import { secureRandomIndex } from "../lib/random";
 import { DECELERATION_STEPS_MS, getNextCandidate, SPIN_INTERVAL_MS } from "../lib/timing";
@@ -9,6 +9,12 @@ import type { GameAction, GameState } from "../gameTypes";
 type AnimationProps = { state: GameState; dispatch: (action: GameAction) => void };
 
 export function useRouletteAnimation({ state, dispatch }: AnimationProps): void {
+  const currentKeychainIdRef = useRef(state.currentKeychainId);
+  const winnerIdsRef = useRef(state.winnerIds);
+
+  currentKeychainIdRef.current = state.currentKeychainId;
+  winnerIdsRef.current = state.winnerIds;
+
   useEffect(() => {
     if (state.phase !== "spinning") return;
     const candidates = KEYCHAINS.map((keychain) => keychain.id).filter(
@@ -25,7 +31,7 @@ export function useRouletteAnimation({ state, dispatch }: AnimationProps): void 
   useEffect(() => {
     if (state.phase !== "decelerating" || state.pendingWinnerId === null) return;
     const candidates = KEYCHAINS.map((keychain) => keychain.id).filter(
-      (id) => !state.winnerIds.includes(id) && id !== state.pendingWinnerId
+      (id) => !winnerIdsRef.current.includes(id) && id !== state.pendingWinnerId
     );
     let step = 0;
     let timer: number | undefined;
@@ -37,7 +43,7 @@ export function useRouletteAnimation({ state, dispatch }: AnimationProps): void 
       if (candidates.length > 0) {
         dispatch({
           type: "DISPLAY_KEYCHAIN",
-          keychainId: getNextCandidate(candidates, state.currentKeychainId, secureRandomIndex)
+          keychainId: getNextCandidate(candidates, currentKeychainIdRef.current, secureRandomIndex)
         });
       }
       timer = window.setTimeout(() => {
@@ -47,5 +53,5 @@ export function useRouletteAnimation({ state, dispatch }: AnimationProps): void 
     };
     advance();
     return () => { if (timer !== undefined) window.clearTimeout(timer); };
-  }, [dispatch, state.currentKeychainId, state.pendingWinnerId, state.phase, state.winnerIds]);
+  }, [dispatch, state.pendingWinnerId, state.phase]);
 }

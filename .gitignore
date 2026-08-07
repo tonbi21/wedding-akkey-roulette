@@ -7,3 +7,5 @@ test-results/
 coverage/
 *.tsbuildinfo
 .vercel/
+AGENTS.md
+CLAUDE.md

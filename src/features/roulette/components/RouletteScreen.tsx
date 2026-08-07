@@ -172,7 +172,7 @@ export function RouletteScreen({
   };
 
   return (
-    <main className="roulette-shell">
+    <main className="roulette-shell" data-phase={state.phase} data-winner-count={state.winnerIds.length}>
       <section className="roulette-card">
         <header className="roulette-header">
           <p className="roulette-header__eyebrow">Wedding Lucky Draw</p>
