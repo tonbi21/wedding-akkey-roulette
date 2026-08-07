@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { KEYCHAINS } from "../keychains";
 import { type AssetLoadState } from "../lib/assets";
 import { AUDIO_ASSETS } from "../lib/assets";
+import { getRestoredPhase, getRestoredRound, loadGameState, saveGameState } from "../lib/persistence";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import { useAudioController, type AudioController } from "../hooks/useAudioController";
 import { useRouletteAnimation } from "../hooks/useRouletteAnimation";
@@ -55,6 +56,7 @@ export function RouletteScreen({
 
   const [state, setState] = useState<GameState>(initialState ?? initialGameState);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [persistenceWarning, setPersistenceWarning] = useState(false);
 
   const dispatch = useCallback((action: GameAction) => {
     setState((currentState) => gameReducer(currentState, action));
@@ -74,6 +76,19 @@ export function RouletteScreen({
     }
 
     if (activeAssetState.ready) {
+      if (typeof window !== "undefined" && !initialState) {
+        const persisted = loadGameState(window.localStorage);
+        if (persisted) {
+          setState({
+            ...initialGameState,
+            phase: getRestoredPhase(persisted.winnerIds, persisted.completed),
+            round: getRestoredRound(persisted.winnerIds),
+            winnerIds: persisted.winnerIds,
+            assetsReady: true
+          });
+          return;
+        }
+      }
       dispatch({ type: "ASSETS_READY" });
       return;
     }
@@ -82,6 +97,12 @@ export function RouletteScreen({
       dispatch({ type: "ASSETS_FAILED" });
     }
   }, [activeAssetState.failedAssets.length, activeAssetState.ready, state.phase]);
+
+  useEffect(() => {
+    if (state.winnerIds.length === 0 || typeof window === "undefined") return;
+    const result = saveGameState(window.localStorage, state.winnerIds, state.winnerIds.length === 3);
+    setPersistenceWarning(!result.ok);
+  }, [state.winnerIds]);
 
   useEffect(() => {
     if (state.phase !== "countdown") {
@@ -177,6 +198,7 @@ export function RouletteScreen({
             読み込みエラー / Loading error
           </p>
         ) : null}
+        {persistenceWarning ? <p className="roulette-status roulette-status--error">履歴を保存できません。ページを閉じないでください。</p> : null}
 
         <div className="roulette-controls">
           {state.phase === "ready" ? (

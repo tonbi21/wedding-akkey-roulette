@@ -3,6 +3,8 @@ import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 
+vi.mock("canvas-confetti", () => ({ default: vi.fn() }));
+
 if (!globalThis.crypto) {
   Object.defineProperty(globalThis, "crypto", {
     configurable: true,
