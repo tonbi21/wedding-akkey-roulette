@@ -117,6 +117,17 @@ describe("restored game state helpers", () => {
     expect(getRestoredPhase(["keychain-01", "keychain-02", "keychain-03"], true)).toBe(
       "complete"
     );
+    expect(getRestoredPhase(["keychain-01"], true)).toBe("idle");
+  });
+
+  it("rejects a completed payload unless exactly three winners are stored", () => {
+    const payload = JSON.stringify({
+      winnerIds: ["keychain-01"],
+      completed: true,
+      savedAt: "2026-08-07T12:34:56.000Z"
+    });
+
+    expect(loadGameState(createStorage(payload))).toBeNull();
   });
 
   it("restores the next round after each confirmed winner", () => {

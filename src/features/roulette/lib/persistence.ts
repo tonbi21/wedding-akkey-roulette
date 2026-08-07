@@ -45,6 +45,10 @@ const isPersistedGameState = (value: unknown): value is PersistedGameState => {
     return false;
   }
 
+  if (value.completed !== (value.winnerIds.length === 3)) {
+    return false;
+  }
+
   return !Number.isNaN(Date.parse(value.savedAt));
 };
 
@@ -96,7 +100,7 @@ export const loadGameState = (
 };
 
 export const getRestoredPhase = (winnerIds: string[], completed: boolean): "idle" | "complete" =>
-  winnerIds.length >= 3 || completed ? "complete" : "idle";
+  winnerIds.length === 3 ? "complete" : "idle";
 
 export const getRestoredRound = (winnerIds: string[]): 1 | 2 | 3 => {
   if (winnerIds.length === 0) {
