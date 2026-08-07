@@ -59,6 +59,7 @@ describe("createAudioController", () => {
 
   it("does not reject when a browser cannot play an audio source", async () => {
     const audio = createFakeAudio();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     audio.play = vi.fn(async () => {
       throw new DOMException("The element has no supported sources.", "NotSupportedError");
     });
@@ -68,6 +69,8 @@ describe("createAudioController", () => {
     );
 
     await expect(controller.startRoulette()).resolves.toBeUndefined();
+    expect(warn).toHaveBeenCalledWith("Audio playback failed for roulette", expect.any(DOMException));
+    warn.mockRestore();
   });
 
   it("keeps waiting audio playing when it starts during the unlock gesture", async () => {
