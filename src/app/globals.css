@@ -1,0 +1,173 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #120c28;
+  color: #fff9ef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(147, 108, 255, 0.45), transparent 35%),
+    linear-gradient(180deg, #26164d 0%, #120c28 100%);
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid #fff4a8;
+  outline-offset: 3px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.roulette-shell {
+  display: grid;
+  gap: 1.5rem;
+  min-height: 100vh;
+  padding: 1.5rem;
+  place-items: center;
+}
+
+.roulette-card {
+  width: min(100%, 32rem);
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1.5rem;
+  background: rgba(20, 14, 46, 0.82);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+}
+
+.roulette-header {
+  text-align: center;
+}
+
+.roulette-header__eyebrow {
+  margin: 0 0 0.35rem;
+  color: #d8c8ff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.roulette-header__title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.roulette-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 1.5rem 0;
+  aspect-ratio: 1 / 1;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.roulette-stage__image {
+  width: min(100%, 24rem);
+  border-radius: 1.25rem;
+}
+
+.roulette-overlay {
+  position: absolute;
+  inset: auto 1rem 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(9, 7, 24, 0.8);
+  text-align: center;
+}
+
+.roulette-overlay__eyebrow,
+.roulette-overlay__title,
+.roulette-status {
+  margin: 0;
+}
+
+.roulette-overlay__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.roulette-status {
+  text-align: center;
+}
+
+.roulette-status--error {
+  color: #ffb2b2;
+}
+
+.roulette-controls {
+  display: flex;
+  justify-content: center;
+  min-height: 4rem;
+}
+
+.roulette-button {
+  min-width: 9rem;
+  min-height: 3.5rem;
+  padding: 0.95rem 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  color: #160f30;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.roulette-button--primary {
+  background: #fff4a8;
+}
+
+.roulette-button--secondary {
+  background: #d8c8ff;
+}
+
+.roulette-button--danger {
+  background: #ff8a8a;
+}
+
+.history-dialog {
+  width: min(100%, 32rem);
+  padding: 1rem 1.25rem 1.25rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.history-dialog__title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+}
+
+.history-dialog__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.history-dialog__item {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.history-dialog__image {
+  width: 100%;
+}
