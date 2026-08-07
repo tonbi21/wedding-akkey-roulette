@@ -66,7 +66,8 @@ export function createAudioController(
       await track.play();
     } catch (error) {
       // Audio is optional; an unsupported or blocked source must not stop the draw.
-      if (process.env.NODE_ENV !== "production") {
+      const isExpectedInterruption = error instanceof Error && error.name === "AbortError";
+      if (!isExpectedInterruption && process.env.NODE_ENV !== "production") {
         console.warn(`Audio playback failed for ${name}`, error);
       }
     }

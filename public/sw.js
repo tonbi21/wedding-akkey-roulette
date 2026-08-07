@@ -1,13 +1,13 @@
-const CACHE_NAME = "wedding-akkey-roulette-v2";
+const CACHE_NAME = "wedding-akkey-roulette-v3";
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
-  "/audio/waiting.mp3",
-  "/audio/roulette.mp3",
-  "/audio/deceleration.mp3",
-  "/audio/winner.mp3",
+  "/audio/waiting.mp3?v3",
+  "/audio/roulette.mp3?v3",
+  "/audio/deceleration.mp3?v3",
+  "/audio/winner.mp3?v3",
   ...Array.from({ length: 50 }, (_, index) =>
     `/assets/keychains/keychain-${String(index + 1).padStart(2, "0")}.svg`
   )
