@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KEYCHAINS } from "../keychains";
 import { type AssetLoadState } from "../lib/assets";
 import { AUDIO_ASSETS } from "../lib/assets";
-import { getRestoredPhase, getRestoredRound, loadGameState, saveGameState } from "../lib/persistence";
+import { getRestoredPhase, getRestoredRound, loadGameState, PERSISTENCE_KEY, saveGameState } from "../lib/persistence";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import { useAudioController, type AudioController } from "../hooks/useAudioController";
 import { useRouletteAnimation } from "../hooks/useRouletteAnimation";
@@ -57,6 +57,7 @@ export function RouletteScreen({
   const [state, setState] = useState<GameState>(initialState ?? initialGameState);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [persistenceWarning, setPersistenceWarning] = useState(false);
+  const resetRequestedRef = useRef(false);
 
   const dispatch = useCallback((action: GameAction) => {
     setState((currentState) => gameReducer(currentState, action));
@@ -69,6 +70,27 @@ export function RouletteScreen({
       setState(initialState);
     }
   }, [initialState]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("reset") !== "1") return;
+
+    if (window.confirm("抽選履歴を削除して、最初からやり直しますか？")) {
+      try {
+        resetRequestedRef.current = true;
+        window.localStorage.removeItem(PERSISTENCE_KEY);
+        setState(initialGameState);
+        setPersistenceWarning(false);
+      } catch {
+        setPersistenceWarning(true);
+      }
+    }
+
+    url.searchParams.delete("reset");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
 
   useEffect(() => {
     if (state.phase !== "boot") {
@@ -100,6 +122,10 @@ export function RouletteScreen({
 
   useEffect(() => {
     if (state.winnerIds.length === 0 || typeof window === "undefined") return;
+    if (resetRequestedRef.current) {
+      resetRequestedRef.current = false;
+      return;
+    }
     const result = saveGameState(window.localStorage, state.winnerIds, state.winnerIds.length === 3);
     setPersistenceWarning(!result.ok);
   }, [state.winnerIds]);

@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { initialGameState } from "../state/gameReducer";
 import type { GameState } from "../gameTypes";
+import { PERSISTENCE_KEY } from "../lib/persistence";
 import { RouletteScreen } from "./RouletteScreen";
 
 const state = (overrides: Partial<GameState>): GameState => ({ ...initialGameState, ...overrides });
@@ -41,5 +42,24 @@ describe("RouletteScreen", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "1回目の当選画像" })).toBeInTheDocument();
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();
+  });
+
+  it("clears persisted history after confirming the hidden reset query", async () => {
+    window.localStorage.setItem(PERSISTENCE_KEY, JSON.stringify({ winnerIds: ["keychain-01"], completed: false, savedAt: new Date().toISOString() }));
+    window.history.pushState({}, "", "/?reset=1");
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <RouletteScreen
+        assetState={{ ready: true, progress: 100, failedAssets: [] }}
+        initialState={state({ phase: "complete", winnerIds: ["keychain-01"] })}
+      />
+    );
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument());
+    expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
+    expect(window.location.search).toBe("");
+    confirm.mockRestore();
+    window.history.replaceState({}, "", "/");
   });
 });
