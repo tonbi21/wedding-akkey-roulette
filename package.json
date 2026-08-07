@@ -1,0 +1,20 @@
+{
+  "name": "wedding-akkey-roulette",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
