@@ -1,4 +1,4 @@
-const CACHE_NAME = "wedding-akkey-roulette-v1";
+const CACHE_NAME = "wedding-akkey-roulette-v2";
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
@@ -54,6 +54,21 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => caches.match("/").then((response) => response || Response.error()))
+    );
+    return;
+  }
+
+  if (new URL(request.url).pathname.startsWith("/audio/")) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then((response) => response || Response.error()))
     );
     return;
   }
