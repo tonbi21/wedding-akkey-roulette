@@ -121,6 +121,10 @@ img {
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.22);
 }
 
+.winner-overlay--lower {
+  bottom: 0.5rem;
+}
+
 .winner-overlay--compact .roulette-overlay__title {
   color: #ffffff;
   font-size: clamp(1.5rem, 5vw, 2.25rem);

@@ -14,7 +14,8 @@ describe("WinnerOverlay", () => {
       "winner-overlay",
       "winner-overlay--celebration",
       "winner-overlay--bottom",
-      "winner-overlay--compact"
+      "winner-overlay--compact",
+      "winner-overlay--lower"
     );
     expect(confetti).toHaveBeenCalledWith(expect.objectContaining({ particleCount: 120 }));
   });

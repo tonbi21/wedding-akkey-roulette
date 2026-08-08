@@ -13,7 +13,7 @@ export function WinnerOverlay() {
   return (
     <div
       aria-live="polite"
-      className="roulette-overlay winner-overlay winner-overlay--bottom winner-overlay--celebration winner-overlay--compact"
+      className="roulette-overlay winner-overlay winner-overlay--bottom winner-overlay--celebration winner-overlay--compact winner-overlay--lower"
       data-testid="winner-overlay"
     >
       <p className="roulette-overlay__title">当たり</p>
