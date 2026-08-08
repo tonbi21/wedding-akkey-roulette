@@ -12,6 +12,7 @@ const state = (overrides: Partial<GameState>): GameState => ({ ...initialGameSta
 describe("RouletteScreen", () => {
   it("shows ENTER when the game is ready", () => {
     render(<RouletteScreen initialState={state({ phase: "ready", assetsReady: true })} />);
+    expect(screen.getByRole("heading", { name: "爆裂アクキールーレット" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument();
   });
 
