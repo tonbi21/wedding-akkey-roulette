@@ -182,7 +182,6 @@ export function RouletteScreen({
             keychain={visibleKeychain}
           />
           {state.phase === "winner" ? <WinnerOverlay /> : null}
-          {state.phase === "complete" ? <WinnerOverlay complete /> : null}
         </div>
 
         {state.phase === "boot" ? (

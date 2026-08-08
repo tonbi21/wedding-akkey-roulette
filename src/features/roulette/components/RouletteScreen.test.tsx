@@ -73,14 +73,19 @@ describe("RouletteScreen", () => {
     );
     expect(screen.getByRole("button", { name: "NEXT" })).toBeInTheDocument();
     rerender(<RouletteScreen initialState={state({ phase: "complete" })} />);
-    expect(screen.getByText("抽選終了")).toBeInTheDocument();
+    expect(screen.queryByTestId("winner-overlay")).not.toBeInTheDocument();
+    expect(screen.queryByText("抽選終了")).not.toBeInTheDocument();
+    expect(screen.queryByText("COMPLETE")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "START" })).not.toBeInTheDocument();
   });
 
   it("opens history with images only", () => {
     render(<RouletteScreen initialState={state({ phase: "idle", winnerIds: ["keychain-01"] })} />);
-    fireEvent.click(screen.getByRole("button", { name: /history/i }));
+    expect(screen.getByRole("button", { name: "履歴" })).toHaveTextContent("履歴");
+    fireEvent.click(screen.getByRole("button", { name: "履歴" }));
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("履歴");
+    expect(screen.queryByText("History")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog")).toHaveClass("history-dialog--expanded");
     expect(screen.getByRole("img", { name: "1回目の当選画像" })).toBeInTheDocument();
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();

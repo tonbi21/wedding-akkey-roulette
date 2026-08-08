@@ -22,20 +22,20 @@ export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogP
 
   return (
     <>
-      <button aria-label="History" className="history-button" onClick={onOpen} type="button">
-        🏆 {winners.length}
+      <button aria-label="履歴" className="history-button" onClick={onOpen} type="button">
+        履歴
       </button>
       {open ? (
         <div className="history-dialog-backdrop" onClick={onClose} role="presentation">
           <section
-            aria-label="履歴 / History"
+            aria-label="履歴"
             aria-modal="true"
             className="history-dialog history-dialog--expanded"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
           >
             <div className="history-dialog__heading">
-              <h2 className="history-dialog__title">履歴 / History</h2>
+              <h2 className="history-dialog__title">履歴</h2>
               <button aria-label="Close history" onClick={onClose} type="button">×</button>
             </div>
             <div className="history-dialog__grid">
