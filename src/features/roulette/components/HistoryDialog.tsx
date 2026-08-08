@@ -36,13 +36,17 @@ export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogP
           >
             <div className="history-dialog__heading">
               <h2 className="history-dialog__title">履歴</h2>
-              <button aria-label="Close history" onClick={onClose} type="button">×</button>
+              <button aria-label="Close history" className="history-dialog__close" onClick={onClose} type="button">×</button>
             </div>
             <div className="history-dialog__grid">
               {winners.map((winner, index) => (
                 <div className="history-dialog__item" key={winner.id}>
                   <p>{index + 1}回目</p>
-                  <RouletteImage alt={`${index + 1}回目の当選画像`} className="history-dialog__image" keychain={winner} />
+                  <RouletteImage
+                    alt={`${index + 1}回目の当選画像`}
+                    className="history-dialog__image history-dialog__image--inset"
+                    keychain={winner}
+                  />
                 </div>
               ))}
             </div>

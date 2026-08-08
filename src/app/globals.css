@@ -224,6 +224,9 @@ img {
 }
 
 .history-dialog__heading button {
+  display: grid;
+  flex: none;
+  place-items: center;
   width: 2rem;
   height: 2rem;
   border: 1px solid #999999;
@@ -231,6 +234,8 @@ img {
   background: transparent;
   color: #1a1a1a;
   font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
   cursor: pointer;
 }
 
@@ -259,4 +264,10 @@ img {
 
 .history-dialog__image {
   width: 100%;
+}
+
+.history-dialog__image--inset {
+  width: calc(100% - 1.5rem);
+  margin: 0 0.75rem 0.75rem;
+  border-radius: 0.75rem;
 }
