@@ -172,7 +172,7 @@ export function RouletteScreen({
       <section className="roulette-card">
         <header className="roulette-header">
           <p className="roulette-header__eyebrow">Wedding Lucky Draw</p>
-          <h1 className="roulette-header__title">爆裂アクキールーレット</h1>
+          <h1 className="roulette-header__title">Akkey Roulette</h1>
         </header>
 
         <div className="roulette-stage">

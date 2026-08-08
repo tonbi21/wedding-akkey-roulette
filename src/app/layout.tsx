@@ -3,7 +3,7 @@ import "./globals.css";
 import ServiceWorkerRegistrar from "./ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
-  title: "爆裂アクキールーレット",
+  title: "Akkey Roulette",
   description: "Wedding lucky draw app shell"
 };
 
