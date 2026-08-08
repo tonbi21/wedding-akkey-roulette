@@ -27,7 +27,7 @@ describe("RouletteScreen", () => {
     expect(screen.queryByRole("button", { name: "START" })).not.toBeInTheDocument();
   });
 
-  it("stops immediately without showing a product or winner overlay", () => {
+  it("shows the selected product and winner overlay after stopping", () => {
     const audioController: AudioController = {
       unlock: vi.fn(async () => undefined),
       startWaiting: vi.fn(async () => undefined),
@@ -42,8 +42,8 @@ describe("RouletteScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "STOP" }));
 
     expect(screen.getByRole("button", { name: "NEXT" })).toBeInTheDocument();
-    expect(screen.queryByRole("img", { name: "Current roulette image" })).not.toBeInTheDocument();
-    expect(screen.queryByTestId("winner-overlay")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Current roulette image" })).toBeInTheDocument();
+    expect(screen.getByTestId("winner-overlay")).toBeInTheDocument();
     expect(audioController.stopAll).toHaveBeenCalled();
     expect(audioController.startDeceleration).not.toHaveBeenCalled();
   });
@@ -61,7 +61,7 @@ describe("RouletteScreen", () => {
   it("opens history with images only", () => {
     render(<RouletteScreen initialState={state({ phase: "idle", winnerIds: ["keychain-01"] })} />);
     fireEvent.click(screen.getByRole("button", { name: /history/i }));
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
     expect(screen.getByRole("img", { name: "1回目の当選画像" })).toBeInTheDocument();
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();
   });

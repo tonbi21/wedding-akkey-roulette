@@ -56,7 +56,7 @@ describe("gameReducer", () => {
     });
 
     expect(nextState.phase).toBe("winner");
-    expect(nextState.currentKeychainId).toBeNull();
+    expect(nextState.currentKeychainId).toBe("keychain-02");
     expect(nextState.pendingWinnerId).toBeNull();
     expect(nextState.winnerIds).toEqual(["keychain-02"]);
   });
@@ -119,6 +119,26 @@ describe("gameReducer", () => {
       assetsReady: true,
       winnerIds: ["keychain-01", "keychain-02"]
     });
+  });
+
+  it("enters winner state for all three rounds", () => {
+    let state = createState({ phase: "spinning", assetsReady: true });
+
+    state = gameReducer(state, { type: "STOP", winnerId: "keychain-01" });
+    expect(state.phase).toBe("winner");
+    state = gameReducer(state, { type: "NEXT" });
+    state = gameReducer(state, { type: "START" });
+    state = gameReducer(state, { type: "COUNTDOWN_COMPLETE" });
+
+    state = gameReducer(state, { type: "STOP", winnerId: "keychain-02" });
+    expect(state.phase).toBe("winner");
+    state = gameReducer(state, { type: "NEXT" });
+    state = gameReducer(state, { type: "START" });
+    state = gameReducer(state, { type: "COUNTDOWN_COMPLETE" });
+
+    state = gameReducer(state, { type: "STOP", winnerId: "keychain-03" });
+    expect(state.phase).toBe("winner");
+    expect(state.winnerIds).toEqual(["keychain-01", "keychain-02", "keychain-03"]);
   });
 
   it("completes after the third winner and ignores next before winner phase", () => {

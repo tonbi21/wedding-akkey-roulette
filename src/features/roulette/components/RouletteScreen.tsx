@@ -192,14 +192,13 @@ export function RouletteScreen({
         </header>
 
         <div className="roulette-stage">
-          {state.phase !== "winner" ? (
-            <RouletteImage
-              alt="Current roulette image"
-              className="roulette-stage__image"
-              keychain={visibleKeychain}
-            />
-          ) : null}
+          <RouletteImage
+            alt="Current roulette image"
+            className="roulette-stage__image"
+            keychain={visibleKeychain}
+          />
           {state.phase === "countdown" ? <CountdownOverlay /> : null}
+          {state.phase === "winner" ? <WinnerOverlay /> : null}
           {state.phase === "complete" ? <WinnerOverlay complete /> : null}
         </div>
 

@@ -74,7 +74,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       return {
         ...state,
         phase: "winner",
-        currentKeychainId: null,
+        currentKeychainId: action.winnerId,
         pendingWinnerId: null,
         winnerIds: state.winnerIds.includes(action.winnerId)
           ? state.winnerIds

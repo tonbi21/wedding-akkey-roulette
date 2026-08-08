@@ -1,8 +1,8 @@
 :root {
   color-scheme: dark;
   font-family: Inter, "Hiragino Sans", "Yu Gothic", sans-serif;
-  background: #120c28;
-  color: #fff9ef;
+  background: #0d0d0d;
+  color: #f5f5f5;
 }
 
 * {
@@ -18,8 +18,8 @@ body {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(147, 108, 255, 0.45), transparent 35%),
-    linear-gradient(180deg, #26164d 0%, #120c28 100%);
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 35%),
+    linear-gradient(180deg, #252525 0%, #0d0d0d 100%);
 }
 
 button {
@@ -27,7 +27,7 @@ button {
 }
 
 button:focus-visible {
-  outline: 3px solid #fff4a8;
+  outline: 3px solid #ffffff;
   outline-offset: 3px;
 }
 
@@ -38,18 +38,20 @@ img {
 
 .roulette-shell {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: 2rem 1rem;
   place-items: center;
 }
 
 .roulette-card {
   width: min(100%, 32rem);
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 1.5rem;
-  background: rgba(20, 14, 46, 0.82);
+  background: rgba(25, 25, 25, 0.9);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(16px);
 }
@@ -60,7 +62,7 @@ img {
 
 .roulette-header__eyebrow {
   margin: 0 0 0.35rem;
-  color: #d8c8ff;
+  color: #bdbdbd;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -75,10 +77,11 @@ img {
   display: grid;
   place-items: center;
   margin: 1.5rem 0;
+  width: 100%;
   aspect-ratio: 1 / 1;
   padding: 1rem;
   border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .roulette-stage__image {
@@ -160,44 +163,81 @@ img {
 
 .roulette-controls {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   justify-content: center;
+  width: 100%;
   min-height: 4rem;
 }
 
 .roulette-button {
+  width: min(100%, 16rem);
   min-width: 9rem;
   min-height: 3.5rem;
   padding: 0.95rem 1.5rem;
   border: 0;
   border-radius: 999px;
-  color: #160f30;
+  color: #111111;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
 }
 
 .roulette-button--primary {
-  background: #fff4a8;
+  background: #f5f5f5;
 }
 
 .roulette-button--secondary {
-  background: #d8c8ff;
+  background: #cccccc;
 }
 
 .roulette-button--danger {
-  background: #ff8a8a;
+  background: #666666;
+  color: #ffffff;
+}
+
+.history-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.72);
 }
 
 .history-dialog {
   width: min(100%, 32rem);
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
   padding: 1rem 1.25rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: #222222;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.45);
+}
+
+.history-dialog__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .history-dialog__title {
   margin: 0 0 1rem;
   font-size: 1rem;
+}
+
+.history-dialog__heading button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #666666;
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
 }
 
 .history-dialog__grid {
@@ -214,38 +254,4 @@ img {
 
 .history-dialog__image {
   width: 100%;
-}
-
-@media (min-width: 900px) and (orientation: landscape) {
-  .roulette-card {
-    width: min(92vw, 68rem);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-    gap: 1.5rem 2rem;
-    align-items: center;
-  }
-
-  .roulette-header,
-  .roulette-status,
-  .roulette-controls {
-    grid-column: 1 / -1;
-  }
-
-  .roulette-stage {
-    grid-column: 1;
-    grid-row: 2 / span 2;
-    width: min(100%, 38rem);
-    margin: 0 auto;
-  }
-
-  .roulette-controls {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .history-dialog {
-    grid-column: 2;
-    grid-row: 3;
-    width: 100%;
-  }
 }
