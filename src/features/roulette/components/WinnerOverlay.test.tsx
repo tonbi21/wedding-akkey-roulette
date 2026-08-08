@@ -13,7 +13,8 @@ describe("WinnerOverlay", () => {
     expect(screen.getByTestId("winner-overlay")).toHaveClass(
       "winner-overlay",
       "winner-overlay--celebration",
-      "winner-overlay--bottom"
+      "winner-overlay--bottom",
+      "winner-overlay--compact"
     );
     expect(confetti).toHaveBeenCalledWith(expect.objectContaining({ particleCount: 120 }));
   });
