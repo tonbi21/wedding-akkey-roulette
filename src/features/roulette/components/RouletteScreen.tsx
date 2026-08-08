@@ -10,7 +10,6 @@ import { useAudioController, type AudioController } from "../hooks/useAudioContr
 import { useRouletteAnimation } from "../hooks/useRouletteAnimation";
 import type { GameAction, GameState, Keychain } from "../gameTypes";
 import { gameReducer, initialGameState } from "../state/gameReducer";
-import { CountdownOverlay } from "./CountdownOverlay";
 import { HistoryDialog } from "./HistoryDialog";
 import { RouletteImage } from "./RouletteImage";
 import { StartButton } from "./StartButton";
@@ -130,20 +129,6 @@ export function RouletteScreen({
     setPersistenceWarning(!result.ok);
   }, [state.winnerIds]);
 
-  useEffect(() => {
-    if (state.phase !== "countdown") {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      dispatch({ type: "COUNTDOWN_COMPLETE" });
-    }, 2600);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [state.phase]);
-
   const visibleKeychain = useMemo(() => getVisibleKeychain(state), [state]);
   const historyKeychains = useMemo(() => getHistoryKeychains(state.winnerIds), [state.winnerIds]);
 
@@ -170,14 +155,13 @@ export function RouletteScreen({
 
     dispatch({ type: "STOP", winnerId });
     activeAudioController.stopAll();
+    void activeAudioController.playWinner();
   };
 
   const handleNext = () => {
     if (state.phase !== "winner") return;
     dispatch({ type: "NEXT" });
-    if (state.round === 3) {
-      void activeAudioController.playWinner();
-    } else {
+    if (state.round !== 3) {
       void activeAudioController.startWaiting();
     }
 
@@ -197,7 +181,6 @@ export function RouletteScreen({
             className="roulette-stage__image"
             keychain={visibleKeychain}
           />
-          {state.phase === "countdown" ? <CountdownOverlay /> : null}
           {state.phase === "winner" ? <WinnerOverlay /> : null}
           {state.phase === "complete" ? <WinnerOverlay complete /> : null}
         </div>

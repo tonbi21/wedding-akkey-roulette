@@ -45,7 +45,26 @@ describe("RouletteScreen", () => {
     expect(screen.getByRole("img", { name: "Current roulette image" })).toBeInTheDocument();
     expect(screen.getByTestId("winner-overlay")).toBeInTheDocument();
     expect(audioController.stopAll).toHaveBeenCalled();
+    expect(audioController.playWinner).toHaveBeenCalled();
     expect(audioController.startDeceleration).not.toHaveBeenCalled();
+  });
+
+  it("starts spinning without a ready countdown", () => {
+    const audioController: AudioController = {
+      unlock: vi.fn(async () => undefined),
+      startWaiting: vi.fn(async () => undefined),
+      stopWaiting: vi.fn(async () => undefined),
+      startRoulette: vi.fn(async () => undefined),
+      startDeceleration: vi.fn(async () => undefined),
+      playWinner: vi.fn(async () => undefined),
+      stopAll: vi.fn()
+    };
+
+    render(<RouletteScreen initialState={state({ phase: "idle" })} audioController={audioController} />);
+    fireEvent.click(screen.getByRole("button", { name: "START" }));
+
+    expect(screen.getByRole("button", { name: "STOP" })).toBeInTheDocument();
+    expect(screen.queryByText("3 → 2 → 1 → START!!")).not.toBeInTheDocument();
   });
 
   it("shows NEXT in winner and no start control in complete", () => {

@@ -33,17 +33,9 @@ describe("gameReducer", () => {
     expect(nextState.phase).toBe("idle");
   });
 
-  it("moves from idle to countdown on start", () => {
+  it("moves from idle to spinning on start", () => {
     const nextState = gameReducer(createState({ phase: "idle", assetsReady: true }), {
       type: "START"
-    });
-
-    expect(nextState.phase).toBe("countdown");
-  });
-
-  it("moves from countdown to spinning when countdown completes", () => {
-    const nextState = gameReducer(createState({ phase: "countdown", assetsReady: true }), {
-      type: "COUNTDOWN_COMPLETE"
     });
 
     expect(nextState.phase).toBe("spinning");
@@ -128,13 +120,11 @@ describe("gameReducer", () => {
     expect(state.phase).toBe("winner");
     state = gameReducer(state, { type: "NEXT" });
     state = gameReducer(state, { type: "START" });
-    state = gameReducer(state, { type: "COUNTDOWN_COMPLETE" });
 
     state = gameReducer(state, { type: "STOP", winnerId: "keychain-02" });
     expect(state.phase).toBe("winner");
     state = gameReducer(state, { type: "NEXT" });
     state = gameReducer(state, { type: "START" });
-    state = gameReducer(state, { type: "COUNTDOWN_COMPLETE" });
 
     state = gameReducer(state, { type: "STOP", winnerId: "keychain-03" });
     expect(state.phase).toBe("winner");

@@ -7,7 +7,6 @@ export type GamePhase =
   | "boot"
   | "ready"
   | "idle"
-  | "countdown"
   | "spinning"
   | "winner"
   | "complete"
@@ -29,7 +28,6 @@ export type GameAction =
   | { type: "ASSETS_FAILED" }
   | { type: "ENTER" }
   | { type: "START" }
-  | { type: "COUNTDOWN_COMPLETE" }
   | { type: "DISPLAY_KEYCHAIN"; keychainId: string }
   | { type: "STOP"; winnerId: string }
   | { type: "NEXT" }

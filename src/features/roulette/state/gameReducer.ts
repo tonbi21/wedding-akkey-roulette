@@ -46,16 +46,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
 
       return {
         ...state,
-        phase: "countdown"
-      };
-
-    case "COUNTDOWN_COMPLETE":
-      if (state.phase !== "countdown") {
-        return state;
-      }
-
-      return {
-        ...state,
         phase: "spinning"
       };
 
