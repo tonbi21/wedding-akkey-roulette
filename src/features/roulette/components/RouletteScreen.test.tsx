@@ -88,7 +88,9 @@ describe("RouletteScreen", () => {
     expect(screen.queryByText("History")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog")).toHaveClass("history-dialog--expanded");
     expect(screen.getByRole("img", { name: "1回目の当選画像" })).toHaveClass("history-dialog__image--inset");
-    expect(screen.getByRole("button", { name: "Close history" })).toHaveClass("history-dialog__close");
+    expect(screen.getByRole("button", { name: "履歴を閉じる" })).toHaveClass("history-dialog__close");
+    expect(screen.getByTestId("history-close-icon")).toBeInTheDocument();
+    expect(screen.queryByText("×")).not.toBeInTheDocument();
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();
   });
 

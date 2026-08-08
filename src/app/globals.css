@@ -239,6 +239,19 @@ img {
   cursor: pointer;
 }
 
+.history-dialog__close-icon {
+  display: block;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.history-dialog__close-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2.25;
+}
+
 .history-dialog__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 15rem));

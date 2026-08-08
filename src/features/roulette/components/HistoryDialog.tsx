@@ -36,7 +36,17 @@ export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogP
           >
             <div className="history-dialog__heading">
               <h2 className="history-dialog__title">履歴</h2>
-              <button aria-label="Close history" className="history-dialog__close" onClick={onClose} type="button">×</button>
+              <button aria-label="履歴を閉じる" className="history-dialog__close" onClick={onClose} type="button">
+                <svg
+                  aria-hidden="true"
+                  className="history-dialog__close-icon"
+                  data-testid="history-close-icon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
             </div>
             <div className="history-dialog__grid">
               {winners.map((winner, index) => (
