@@ -81,6 +81,7 @@ describe("RouletteScreen", () => {
     render(<RouletteScreen initialState={state({ phase: "idle", winnerIds: ["keychain-01"] })} />);
     fireEvent.click(screen.getByRole("button", { name: /history/i }));
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("dialog")).toHaveClass("history-dialog--expanded");
     expect(screen.getByRole("img", { name: "1回目の当選画像" })).toBeInTheDocument();
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();
   });

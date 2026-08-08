@@ -110,39 +110,24 @@ img {
 }
 
 .winner-overlay {
-  animation: winner-flash 700ms ease-out, winner-shake 500ms ease-out;
-  box-shadow: 0 0 3rem rgba(255, 244, 168, 0.45);
+  inset: 50% auto auto 50%;
+  width: min(86%, 22rem);
+  padding: 1.3rem 1.5rem 1.45rem;
+  transform: translate(-50%, -50%);
+  border: 4px solid #ffffff;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #ef2d56 0%, #ff8a00 100%);
+  color: #ffffff;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.22);
 }
 
-.winner-overlay::before,
-.winner-overlay::after {
-  content: "✦  ✧  ✦";
-  position: absolute;
-  inset: -1.2rem 1rem auto;
-  color: #fff4a8;
-  letter-spacing: 1rem;
-  animation: sparkle 900ms ease-out infinite alternate;
-}
-
-.winner-overlay::after {
-  inset: auto 1rem -1.2rem;
-  animation-delay: 220ms;
-}
-
-@keyframes winner-flash {
-  0% { background: rgba(255, 255, 255, 0.9); }
-  100% { background: rgba(9, 7, 24, 0.8); }
-}
-
-@keyframes winner-shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px) rotate(-1deg); }
-  75% { transform: translateX(4px) rotate(1deg); }
-}
-
-@keyframes sparkle {
-  from { opacity: 0.3; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1.1); }
+.winner-overlay--celebration .roulette-overlay__title {
+  color: #ffffff;
+  font-size: clamp(2.4rem, 10vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-shadow: 0 0.16rem 0 rgba(155, 18, 48, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -219,6 +204,10 @@ img {
   box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
 }
 
+.history-dialog--expanded {
+  width: min(94vw, 60rem);
+}
+
 .history-dialog__heading {
   display: flex;
   align-items: center;
@@ -243,12 +232,15 @@ img {
 
 .history-dialog__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 15rem));
   gap: 1.25rem;
+  justify-content: center;
   margin-top: 1.5rem;
 }
 
 .history-dialog__item {
+  width: min(100%, 15rem);
+  justify-self: center;
   border-radius: 1rem;
   overflow: hidden;
   background: #f0f0f0;

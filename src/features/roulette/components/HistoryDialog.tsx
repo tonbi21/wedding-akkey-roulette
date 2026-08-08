@@ -30,7 +30,7 @@ export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogP
           <section
             aria-label="履歴 / History"
             aria-modal="true"
-            className="history-dialog"
+            className="history-dialog history-dialog--expanded"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
           >

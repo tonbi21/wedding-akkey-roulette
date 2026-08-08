@@ -15,7 +15,11 @@ export function WinnerOverlay({ complete = false }: WinnerOverlayProps) {
   }, [complete]);
 
   return (
-    <div aria-live="polite" className="roulette-overlay winner-overlay" data-testid="winner-overlay">
+    <div
+      aria-live="polite"
+      className="roulette-overlay winner-overlay winner-overlay--celebration"
+      data-testid="winner-overlay"
+    >
       {complete ? (
         <>
           <p className="roulette-overlay__eyebrow">抽選終了</p>
