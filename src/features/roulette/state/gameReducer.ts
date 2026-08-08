@@ -60,7 +60,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       };
 
     case "DISPLAY_KEYCHAIN":
-      if (state.phase !== "spinning" && state.phase !== "decelerating") {
+      if (state.phase !== "spinning") {
         return state;
       }
 
@@ -73,32 +73,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
 
       return {
         ...state,
-        phase: "decelerating",
-        pendingWinnerId: action.winnerId
-      };
-
-    case "DECELERATION_COMPLETE":
-      if (state.phase !== "decelerating" || state.pendingWinnerId === null) {
-        return state;
-      }
-
-      return {
-        ...state,
-        phase: "reveal",
-        currentKeychainId: state.pendingWinnerId
-      };
-
-    case "REVEAL_COMPLETE":
-      if (state.phase !== "reveal" || state.currentKeychainId === null) {
-        return state;
-      }
-
-      return {
-        ...state,
         phase: "winner",
-        winnerIds: state.winnerIds.includes(state.currentKeychainId)
+        currentKeychainId: null,
+        pendingWinnerId: null,
+        winnerIds: state.winnerIds.includes(action.winnerId)
           ? state.winnerIds
-          : [...state.winnerIds, state.currentKeychainId]
+          : [...state.winnerIds, action.winnerId]
       };
 
     case "NEXT":

@@ -27,7 +27,7 @@
 **Interfaces:**
 - `gameReducer(state, { type: "STOP", winnerId })` returns `phase: "winner"`, clears `pendingWinnerId`, and appends `winnerId` once.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Update the STOP test to expect direct `winner` state and one stored winner:
 
@@ -42,17 +42,17 @@ expect(nextState.pendingWinnerId).toBeNull();
 expect(nextState.winnerIds).toEqual(["keychain-02"]);
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `node node_modules/vitest/vitest.mjs run src/features/roulette/state/gameReducer.test.ts`
 
 Expected: FAIL because STOP currently enters `decelerating` and does not append the winner.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Change STOP to return `phase: "winner"`, `currentKeychainId: null`, `pendingWinnerId: null`, and append `action.winnerId` if it is not already present. Remove unreachable decelerating/reveal transitions and their phase/action types.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `node node_modules/vitest/vitest.mjs run src/features/roulette/state/gameReducer.test.ts`
 
@@ -71,7 +71,7 @@ Expected: PASS.
 - `useRouletteAnimation` retains only the spinning Interval and its cleanup.
 - `handleStop` calls `activeAudioController.stopAll()` and does not call `startDeceleration()`.
 
-- [ ] **Step 1: Write the failing screen test**
+- [x] **Step 1: Write the failing screen test**
 
 Render a spinning screen with a mock audio controller, click STOP, and assert the screen enters winner state, NEXT is visible, and `stopAll` is called while `startDeceleration` is not called.
 
@@ -94,17 +94,17 @@ expect(audioController.stopAll).toHaveBeenCalled();
 expect(audioController.startDeceleration).not.toHaveBeenCalled();
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `node node_modules/vitest/vitest.mjs run src/features/roulette/components/RouletteScreen.test.tsx`
 
 Expected: FAIL because STOP currently starts deceleration and the reducer leaves the screen outside winner.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Remove the deceleration effect and `DECELERATION_STEPS_MS` usage. In `handleStop`, dispatch STOP and call `stopAll`. Render `RouletteImage` and `WinnerOverlay` only when appropriate so winner state contains no product or winner overlay.
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 Run: `node node_modules/vitest/vitest.mjs run src/features/roulette/components/RouletteScreen.test.tsx src/features/roulette/lib/timing.test.ts`
 
@@ -115,18 +115,18 @@ Expected: PASS.
 **Files:**
 - Verify: all modified files above
 
-- [ ] **Step 1: Run the full test suite**
+- [x] **Step 1: Run the full test suite**
 
 Run: `node node_modules/vitest/vitest.mjs run`
 
 Expected: all tests pass.
 
-- [ ] **Step 2: Run static checks**
+- [x] **Step 2: Run static checks**
 
 Run: `node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit` and `node scripts/lint.mjs`.
 
 Expected: both exit successfully.
 
-- [ ] **Step 3: Inspect the diff and commit code**
+- [x] **Step 3: Inspect the diff and commit code**
 
 Run: `git diff --check` and commit only source/tests/docs related to this feature; leave the four user audio files unstaged.

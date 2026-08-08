@@ -144,20 +144,6 @@ export function RouletteScreen({
     };
   }, [state.phase]);
 
-  useEffect(() => {
-    if (state.phase !== "reveal") {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      dispatch({ type: "REVEAL_COMPLETE" });
-    }, 1000);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [state.phase]);
-
   const visibleKeychain = useMemo(() => getVisibleKeychain(state), [state]);
   const historyKeychains = useMemo(() => getHistoryKeychains(state.winnerIds), [state.winnerIds]);
 
@@ -183,7 +169,7 @@ export function RouletteScreen({
     const winnerId = resolveWinnerId(availableIds, state);
 
     dispatch({ type: "STOP", winnerId });
-    void activeAudioController.startDeceleration();
+    activeAudioController.stopAll();
   };
 
   const handleNext = () => {
@@ -206,13 +192,14 @@ export function RouletteScreen({
         </header>
 
         <div className="roulette-stage">
-          <RouletteImage
-            alt="Current roulette image"
-            className="roulette-stage__image"
-            keychain={visibleKeychain}
-          />
+          {state.phase !== "winner" ? (
+            <RouletteImage
+              alt="Current roulette image"
+              className="roulette-stage__image"
+              keychain={visibleKeychain}
+            />
+          ) : null}
           {state.phase === "countdown" ? <CountdownOverlay /> : null}
-          {state.phase === "winner" ? <WinnerOverlay /> : null}
           {state.phase === "complete" ? <WinnerOverlay complete /> : null}
         </div>
 

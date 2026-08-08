@@ -49,14 +49,16 @@ describe("gameReducer", () => {
     expect(nextState.phase).toBe("spinning");
   });
 
-  it("moves from spinning to decelerating and stores exactly one pending winner", () => {
+  it("stops immediately and stores exactly one winner", () => {
     const nextState = gameReducer(createState({ phase: "spinning", assetsReady: true }), {
       type: "STOP",
       winnerId: "keychain-02"
     });
 
-    expect(nextState.phase).toBe("decelerating");
-    expect(nextState.pendingWinnerId).toBe("keychain-02");
+    expect(nextState.phase).toBe("winner");
+    expect(nextState.currentKeychainId).toBeNull();
+    expect(nextState.pendingWinnerId).toBeNull();
+    expect(nextState.winnerIds).toEqual(["keychain-02"]);
   });
 
   it("updates the visible keychain while spinning without changing the phase", () => {
@@ -78,44 +80,6 @@ describe("gameReducer", () => {
     expect(gameReducer(stoppedState, { type: "STOP", winnerId: "keychain-02" })).toEqual(
       stoppedState
     );
-  });
-
-  it("moves from decelerating to reveal and promotes the pending winner to current", () => {
-    const nextState = gameReducer(
-      createState({
-        phase: "decelerating",
-        assetsReady: true,
-        pendingWinnerId: "keychain-03"
-      }),
-      { type: "DECELERATION_COMPLETE" }
-    );
-
-    expect(nextState).toEqual({
-      ...initialGameState,
-      phase: "reveal",
-      assetsReady: true,
-      currentKeychainId: "keychain-03",
-      pendingWinnerId: "keychain-03"
-    });
-  });
-
-  it("moves from reveal to winner and appends the revealed winner once", () => {
-    const firstWinnerState = gameReducer(
-      createState({
-        phase: "reveal",
-        assetsReady: true,
-        currentKeychainId: "keychain-02",
-        pendingWinnerId: "keychain-02",
-        winnerIds: ["keychain-01"]
-      }),
-      { type: "REVEAL_COMPLETE" }
-    );
-
-    const repeatedWinnerState = gameReducer(firstWinnerState, { type: "REVEAL_COMPLETE" });
-
-    expect(firstWinnerState.phase).toBe("winner");
-    expect(firstWinnerState.winnerIds).toEqual(["keychain-01", "keychain-02"]);
-    expect(repeatedWinnerState).toEqual(firstWinnerState);
   });
 
   it("moves to the next round from winner on rounds one and two", () => {

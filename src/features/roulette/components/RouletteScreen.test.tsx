@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { initialGameState } from "../state/gameReducer";
 import type { GameState } from "../gameTypes";
 import { PERSISTENCE_KEY } from "../lib/persistence";
+import type { AudioController } from "../hooks/useAudioController";
 import { RouletteScreen } from "./RouletteScreen";
 
 const state = (overrides: Partial<GameState>): GameState => ({ ...initialGameState, ...overrides });
@@ -24,6 +25,27 @@ describe("RouletteScreen", () => {
     render(<RouletteScreen initialState={state({ phase: "spinning", assetsReady: true })} />);
     expect(screen.getByRole("button", { name: "STOP" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "START" })).not.toBeInTheDocument();
+  });
+
+  it("stops immediately without showing a product or winner overlay", () => {
+    const audioController: AudioController = {
+      unlock: vi.fn(async () => undefined),
+      startWaiting: vi.fn(async () => undefined),
+      stopWaiting: vi.fn(async () => undefined),
+      startRoulette: vi.fn(async () => undefined),
+      startDeceleration: vi.fn(async () => undefined),
+      playWinner: vi.fn(async () => undefined),
+      stopAll: vi.fn()
+    };
+
+    render(<RouletteScreen initialState={state({ phase: "spinning" })} audioController={audioController} />);
+    fireEvent.click(screen.getByRole("button", { name: "STOP" }));
+
+    expect(screen.getByRole("button", { name: "NEXT" })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Current roulette image" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("winner-overlay")).not.toBeInTheDocument();
+    expect(audioController.stopAll).toHaveBeenCalled();
+    expect(audioController.startDeceleration).not.toHaveBeenCalled();
   });
 
   it("shows NEXT in winner and no start control in complete", () => {

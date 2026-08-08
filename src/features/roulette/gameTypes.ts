@@ -9,8 +9,6 @@ export type GamePhase =
   | "idle"
   | "countdown"
   | "spinning"
-  | "decelerating"
-  | "reveal"
   | "winner"
   | "complete"
   | "error";
@@ -34,7 +32,5 @@ export type GameAction =
   | { type: "COUNTDOWN_COMPLETE" }
   | { type: "DISPLAY_KEYCHAIN"; keychainId: string }
   | { type: "STOP"; winnerId: string }
-  | { type: "DECELERATION_COMPLETE" }
-  | { type: "REVEAL_COMPLETE" }
   | { type: "NEXT" }
   | { type: "RESET" };
