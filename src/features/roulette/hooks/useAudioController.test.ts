@@ -37,6 +37,7 @@ describe("createAudioController", () => {
     await controller.startRoulette();
 
     expect(audios.get("/roulette.mp3")?.play).toHaveBeenCalled();
+    expect(audios.get("/roulette.mp3")?.loop).toBe(true);
     expect("startWaiting" in controller).toBe(false);
     expect("stopWaiting" in controller).toBe(false);
   });

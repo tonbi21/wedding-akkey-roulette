@@ -75,7 +75,7 @@ export function createAudioController(
     unlock() {
       return Promise.resolve();
     },
-    startRoulette: () => play("roulette"),
+    startRoulette: () => play("roulette", true),
     startDeceleration: () => play("deceleration"),
     playWinner: () => play("winner"),
     stopAll: () => Object.values(tracks).forEach(stop)
