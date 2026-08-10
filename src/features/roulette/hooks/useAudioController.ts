@@ -25,6 +25,22 @@ export type AudioController = {
 type TrackName = "roulette" | "deceleration" | "winner";
 type AudioSources = Record<TrackName, string>;
 type AudioFactory = (source: string) => AudioElementLike;
+type AudioBufferLike = object;
+type AudioBufferSourceLike = {
+  buffer: AudioBufferLike | null;
+  loop: boolean;
+  connect(destination: unknown): void;
+  start(): void;
+  stop(): void;
+  disconnect?(): void;
+};
+type AudioContextLike = {
+  destination: unknown;
+  resume(): Promise<void>;
+  decodeAudioData(data: ArrayBuffer): Promise<AudioBufferLike>;
+  createBufferSource(): AudioBufferSourceLike;
+};
+type AudioContextFactory = () => AudioContextLike | null;
 
 const defaultAudioFactory: AudioFactory = (source) => {
   if (typeof Audio === "function") return new Audio(source);
@@ -41,20 +57,76 @@ const defaultAudioFactory: AudioFactory = (source) => {
   };
 };
 
+const defaultAudioContextFactory: AudioContextFactory = () => {
+  if (typeof window === "undefined" || typeof window.AudioContext !== "function") return null;
+  return new window.AudioContext();
+};
+
 export function createAudioController(
   sources: AudioSources,
-  factory: AudioFactory = defaultAudioFactory
+  factory: AudioFactory = defaultAudioFactory,
+  contextFactory: AudioContextFactory = defaultAudioContextFactory
 ): AudioController {
   const tracks = Object.fromEntries(
     Object.entries(sources).map(([name, source]) => [name, factory(source)])
   ) as Record<TrackName, AudioElementLike>;
+  let audioContext: AudioContextLike | null = null;
+  let rouletteBufferPromise: Promise<AudioBufferLike | null> | null = null;
+  let rouletteSource: AudioBufferSourceLike | null = null;
+  let rouletteStartToken = 0;
 
   const stop = (track: AudioElementLike) => {
     track.pause();
     track.currentTime = 0;
   };
 
+  const stopRouletteSource = () => {
+    if (!rouletteSource) return;
+    try {
+      rouletteSource.stop();
+    } catch {
+      // A source that already stopped can be safely discarded.
+    }
+    rouletteSource.disconnect?.();
+    rouletteSource = null;
+  };
+
+  const cancelRouletteStart = () => {
+    rouletteStartToken += 1;
+    stopRouletteSource();
+  };
+
+  const getAudioContext = () => {
+    if (audioContext === null) audioContext = contextFactory();
+    return audioContext;
+  };
+
+  const prepareAudioContext = async () => {
+    const context = getAudioContext();
+    if (!context) return null;
+    try {
+      await context.resume();
+      return context;
+    } catch {
+      return null;
+    }
+  };
+
+  const loadRouletteBuffer = async (context: AudioContextLike) => {
+    if (!rouletteBufferPromise) {
+      rouletteBufferPromise = fetch(sources.roulette)
+        .then((response) => {
+          if (!response.ok) throw new Error(`Failed to load ${sources.roulette}`);
+          return response.arrayBuffer();
+        })
+        .then((data) => context.decodeAudioData(data))
+        .catch(() => null);
+    }
+    return rouletteBufferPromise;
+  };
+
   const play = async (name: TrackName, loop = false) => {
+    cancelRouletteStart();
     Object.entries(tracks).forEach(([trackName, track]) => {
       if (trackName !== name) stop(track);
     });
@@ -71,14 +143,39 @@ export function createAudioController(
     }
   };
 
+  const startRoulette = async () => {
+    const requestToken = ++rouletteStartToken;
+    stopRouletteSource();
+    const context = await prepareAudioContext();
+    if (context) {
+      const buffer = await loadRouletteBuffer(context);
+      if (buffer && requestToken === rouletteStartToken) {
+        Object.values(tracks).forEach(stop);
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        source.connect(context.destination);
+        source.start();
+        rouletteSource = source;
+        return;
+      }
+    }
+
+    if (requestToken === rouletteStartToken) await play("roulette", true);
+  };
+
   return {
-    unlock() {
-      return Promise.resolve();
+    async unlock() {
+      const context = await prepareAudioContext();
+      if (context) void loadRouletteBuffer(context);
     },
-    startRoulette: () => play("roulette", true),
+    startRoulette,
     startDeceleration: () => play("deceleration"),
     playWinner: () => play("winner"),
-    stopAll: () => Object.values(tracks).forEach(stop)
+    stopAll: () => {
+      cancelRouletteStart();
+      Object.values(tracks).forEach(stop);
+    }
   };
 }
 

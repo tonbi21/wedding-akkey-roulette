@@ -42,6 +42,42 @@ describe("createAudioController", () => {
     expect("stopWaiting" in controller).toBe(false);
   });
 
+  it("uses a looping Web Audio buffer when the browser supports it", async () => {
+    const source = {
+      buffer: null,
+      loop: false,
+      connect: vi.fn(),
+      start: vi.fn(),
+      stop: vi.fn()
+    };
+    const context = {
+      destination: {},
+      resume: vi.fn(async () => undefined),
+      decodeAudioData: vi.fn(async () => ({})),
+      createBufferSource: vi.fn(() => source)
+    };
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      arrayBuffer: async () => new ArrayBuffer(0)
+    })));
+
+    const controller = createAudioController(
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      (src) => { const audio = createFakeAudio(); audio.src = src; return audio; },
+      () => context
+    );
+
+    await controller.startRoulette();
+
+    expect(context.decodeAudioData).toHaveBeenCalled();
+    expect(source.loop).toBe(true);
+    expect(source.start).toHaveBeenCalled();
+
+    controller.stopAll();
+    expect(source.stop).toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
   it("stops and resets every audio element", () => {
     const audio = createFakeAudio();
     audio.src = "/winner.mp3";
