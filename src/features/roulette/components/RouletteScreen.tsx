@@ -136,13 +136,11 @@ export function RouletteScreen({
     if (state.phase !== "ready") return;
     dispatch({ type: "ENTER" });
     void activeAudioController.unlock();
-    void activeAudioController.startWaiting();
   };
 
   const handleStart = () => {
     if (state.phase !== "idle") return;
     dispatch({ type: "START" });
-    void activeAudioController.stopWaiting();
     void activeAudioController.startRoulette();
   };
 
@@ -161,10 +159,6 @@ export function RouletteScreen({
   const handleNext = () => {
     if (state.phase !== "winner") return;
     dispatch({ type: "NEXT" });
-    if (state.round !== 3) {
-      void activeAudioController.startWaiting();
-    }
-
   };
 
   return (

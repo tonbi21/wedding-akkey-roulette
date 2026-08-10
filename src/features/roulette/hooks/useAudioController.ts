@@ -16,15 +16,13 @@ export type AudioElementLike = {
 
 export type AudioController = {
   unlock(): Promise<void>;
-  startWaiting(): Promise<void>;
-  stopWaiting(): Promise<void>;
   startRoulette(): Promise<void>;
   startDeceleration(): Promise<void>;
   playWinner(): Promise<void>;
   stopAll(): void;
 };
 
-type TrackName = "waiting" | "roulette" | "deceleration" | "winner";
+type TrackName = "roulette" | "deceleration" | "winner";
 type AudioSources = Record<TrackName, string>;
 type AudioFactory = (source: string) => AudioElementLike;
 
@@ -77,8 +75,6 @@ export function createAudioController(
     unlock() {
       return Promise.resolve();
     },
-    startWaiting: () => play("waiting", true),
-    stopWaiting: async () => { stop(tracks.waiting); },
     startRoulette: () => play("roulette"),
     startDeceleration: () => play("deceleration"),
     playWinner: () => play("winner"),

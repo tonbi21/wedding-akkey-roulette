@@ -19,7 +19,6 @@ describe("createAudioController", () => {
   it("can be created during server rendering without Audio", () => {
     vi.stubGlobal("Audio", undefined);
     expect(() => createAudioController({
-      waiting: "/waiting.mp3",
       roulette: "/roulette.mp3",
       deceleration: "/deceleration.mp3",
       winner: "/winner.mp3"
@@ -27,26 +26,26 @@ describe("createAudioController", () => {
     vi.unstubAllGlobals();
   });
 
-  it("unlocks audio and starts/stops the expected tracks", async () => {
+  it("unlocks audio and starts the expected tracks", async () => {
     const audios = new Map<string, AudioElementLike>();
     const controller = createAudioController(
-      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
       (src) => { const audio = createFakeAudio(); audio.src = src; audios.set(src, audio); return audio; }
     );
 
     await controller.unlock();
-    await controller.startWaiting();
     await controller.startRoulette();
 
-    expect(audios.get("/waiting.mp3")?.pause).toHaveBeenCalled();
     expect(audios.get("/roulette.mp3")?.play).toHaveBeenCalled();
+    expect("startWaiting" in controller).toBe(false);
+    expect("stopWaiting" in controller).toBe(false);
   });
 
   it("stops and resets every audio element", () => {
     const audio = createFakeAudio();
     audio.src = "/winner.mp3";
     const controller = createAudioController(
-      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
       () => audio
     );
 
@@ -65,7 +64,7 @@ describe("createAudioController", () => {
       throw new DOMException("The element has no supported sources.", "NotSupportedError");
     });
     const controller = createAudioController(
-      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
       () => audio
     );
 
@@ -74,28 +73,10 @@ describe("createAudioController", () => {
     warn.mockRestore();
   });
 
-  it("keeps waiting audio playing when it starts during the unlock gesture", async () => {
-    const audios = new Map<string, AudioElementLike>();
-    const controller = createAudioController(
-      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
-      (src) => {
-        const audio = createFakeAudio();
-        audios.set(src, audio);
-        return audio;
-      }
-    );
-
-    const unlock = controller.unlock();
-    await controller.startWaiting();
-    await unlock;
-
-    expect(audios.get("/waiting.mp3")?.paused).toBe(false);
-  });
-
   it("does not reload audio elements while unlocking audio", async () => {
     const audio = createFakeAudio();
     const controller = createAudioController(
-      { waiting: "/waiting.mp3", roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
       () => audio
     );
 

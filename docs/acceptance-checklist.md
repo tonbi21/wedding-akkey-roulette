@@ -11,9 +11,9 @@
 ## Online rehearsal
 
 - [ ] Replace all 50 placeholder SVGs with the approved optimized transparent images.
-- [ ] Replace all four temporary audio files with valid approved MP3 masters.
+- [ ] Replace all three temporary audio files with valid approved MP3 masters.
 - [ ] Verify image and audio preload reaches `ENTER` without an error state.
-- [ ] Click `ENTER` once and confirm waiting audio starts.
+- [ ] Click `ENTER` once and confirm no waiting BGM plays; use the venue sound system during standby.
 - [ ] Complete rounds 1, 2, and 3; confirm no winner repeats.
 - [ ] Confirm the history dialog shows only winner images and no internal IDs.
 - [ ] Confirm the final screen says `抽選終了` and winner audio plays.
