@@ -25,12 +25,18 @@ export type AudioController = {
 type TrackName = "roulette" | "deceleration" | "winner";
 type AudioSources = Record<TrackName, string>;
 type AudioFactory = (source: string) => AudioElementLike;
-type AudioBufferLike = object;
+type AudioBufferLike = {
+  duration?: number;
+  sampleRate?: number;
+  length?: number;
+  numberOfChannels?: number;
+  getChannelData?: (channel: number) => Float32Array;
+};
 type AudioBufferSourceLike = {
   buffer: AudioBufferLike | null;
   loop: boolean;
   connect(destination: unknown): void;
-  start(): void;
+  start(when?: number, offset?: number): void;
   stop(): void;
   disconnect?(): void;
 };
@@ -147,21 +153,39 @@ export function createAudioController(
     const requestToken = ++rouletteStartToken;
     stopRouletteSource();
     const context = await prepareAudioContext();
+    let fallbackReason: "context-unavailable" | "decode-failed";
     if (context) {
       const buffer = await loadRouletteBuffer(context);
       if (buffer && requestToken === rouletteStartToken) {
         Object.values(tracks).forEach(stop);
         const source = context.createBufferSource();
         source.buffer = buffer;
-        source.loop = true;
+        source.loop = false;
         source.connect(context.destination);
-        source.start();
+        source.start(0, 0);
         rouletteSource = source;
+        if (process.env.NODE_ENV !== "production") {
+          console.info("[audio] roulette path=web-audio", {
+            duration: buffer.duration,
+            sampleRate: buffer.sampleRate,
+            length: buffer.length,
+            numberOfChannels: buffer.numberOfChannels,
+            loop: source.loop
+          });
+        }
         return;
       }
+      fallbackReason = "decode-failed";
+    } else {
+      fallbackReason = "context-unavailable";
     }
 
-    if (requestToken === rouletteStartToken) await play("roulette", true);
+    if (requestToken === rouletteStartToken) {
+      if (process.env.NODE_ENV !== "production") {
+        console.info("[audio] roulette path=html-audio-fallback", { reason: fallbackReason });
+      }
+      await play("roulette");
+    }
   };
 
   return {

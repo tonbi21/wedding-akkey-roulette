@@ -1,9 +1,9 @@
 import { KEYCHAINS } from "../keychains";
 
 export const IMAGE_ASSETS = KEYCHAINS.map((keychain) => keychain.imageSrc);
-const AUDIO_ASSET_VERSION = "v5";
+const AUDIO_ASSET_VERSION = "v6";
 export const AUDIO_ASSETS = {
-  roulette: `/audio/roulette.mp3?${AUDIO_ASSET_VERSION}`,
+  roulette: `/audio/percussion_drumroll_90s.mp3?${AUDIO_ASSET_VERSION}`,
   deceleration: `/audio/deceleration.mp3?${AUDIO_ASSET_VERSION}`,
   winner: `/audio/winner.mp3?${AUDIO_ASSET_VERSION}`
 } as const;

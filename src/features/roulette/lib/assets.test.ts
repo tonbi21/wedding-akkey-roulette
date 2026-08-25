@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { preloadAssets } from "./assets";
+import { AUDIO_ASSETS, preloadAssets } from "./assets";
 
 type FakeAsset = {
   src: string;
@@ -16,6 +16,10 @@ const factory = (failures: Set<string> = new Set()) => (src: string): FakeAsset 
 });
 
 describe("preloadAssets", () => {
+  it("uses the long drum roll for roulette playback", () => {
+    expect(AUDIO_ASSETS.roulette).toBe("/audio/percussion_drumroll_90s.mp3?v6");
+  });
+
   it("reports progress after each asset settles", async () => {
     const progress: number[] = [];
     await preloadAssets(["image-a"], ["audio-a"], factory(), factory(), (state) => {

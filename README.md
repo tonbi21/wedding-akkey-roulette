@@ -25,13 +25,13 @@ default `node` is older.
 ## PWA and offline operation
 
 The app registers `/sw.js`, precaches the app shell, local icons, all 50
-keychain images, and the four audio paths. Static same-origin requests are
+keychain images, and the three audio paths. Static same-origin requests are
 cached at runtime as well. No production asset is loaded from an external URL.
 
 For the release rehearsal, open the app online, wait for `ENTER`, close it,
 disable Wi-Fi, reopen the installed PWA, and complete all three rounds. The
 browser Application panel should show the service worker as activated and the
-four audio files as cached.
+three audio files as cached.
 
 ## Resetting rehearsal data
 
@@ -48,11 +48,10 @@ The roulette domain uses local, internal asset paths only. The application expec
 
 The keychain IDs are internal identifiers only and are not meant to be displayed in the UI.
 
-The checked-in SVGs and audio files are local development placeholders. Before
-the wedding release, replace them with the approved 50 optimized transparent
-images and valid MP3 files while preserving the paths above. The current audio
-files contain PCM WAV data under temporary `.mp3` filenames so the browser may
-reject them; this is a release blocker until the real MP3 masters are added.
+The checked-in SVGs are local development placeholders. Before the wedding
+release, replace them with the approved 50 optimized transparent images while
+preserving the paths above. The roulette sound uses the local 90-second drum
+roll asset so it can play once without an audible loop seam.
 
 See [docs/acceptance-checklist.md](docs/acceptance-checklist.md) for the final
 offline and rehearsal checklist.

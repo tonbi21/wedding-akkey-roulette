@@ -37,15 +37,18 @@ describe("createAudioController", () => {
     await controller.startRoulette();
 
     expect(audios.get("/roulette.mp3")?.play).toHaveBeenCalled();
-    expect(audios.get("/roulette.mp3")?.loop).toBe(true);
+    expect(audios.get("/roulette.mp3")?.loop).toBe(false);
     expect("startWaiting" in controller).toBe(false);
     expect("stopWaiting" in controller).toBe(false);
   });
 
-  it("uses a looping Web Audio buffer when the browser supports it", async () => {
+  it("plays the full Web Audio drum roll once when the browser supports it", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
     const source = {
       buffer: null,
       loop: false,
+      loopStart: 0,
+      loopEnd: 0,
       connect: vi.fn(),
       start: vi.fn(),
       stop: vi.fn()
@@ -53,7 +56,12 @@ describe("createAudioController", () => {
     const context = {
       destination: {},
       resume: vi.fn(async () => undefined),
-      decodeAudioData: vi.fn(async () => ({})),
+      decodeAudioData: vi.fn(async () => ({
+        duration: 2.142,
+        sampleRate: 44100,
+        length: 94464,
+        numberOfChannels: 2
+      })),
       createBufferSource: vi.fn(() => source)
     };
     vi.stubGlobal("fetch", vi.fn(async () => ({
@@ -70,12 +78,36 @@ describe("createAudioController", () => {
     await controller.startRoulette();
 
     expect(context.decodeAudioData).toHaveBeenCalled();
-    expect(source.loop).toBe(true);
-    expect(source.start).toHaveBeenCalled();
+    expect(source.loop).toBe(false);
+    expect(source.start).toHaveBeenCalledWith(0, 0);
+    expect(info).toHaveBeenCalledWith("[audio] roulette path=web-audio", {
+      duration: 2.142,
+      sampleRate: 44100,
+      length: 94464,
+      numberOfChannels: 2,
+      loop: false
+    });
 
     controller.stopAll();
     expect(source.stop).toHaveBeenCalled();
+    info.mockRestore();
     vi.unstubAllGlobals();
+  });
+
+  it("reports when roulette falls back to HTML audio", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const controller = createAudioController(
+      { roulette: "/roulette.mp3", deceleration: "/deceleration.mp3", winner: "/winner.mp3" },
+      createFakeAudio,
+      () => null
+    );
+
+    await controller.startRoulette();
+
+    expect(info).toHaveBeenCalledWith("[audio] roulette path=html-audio-fallback", {
+      reason: "context-unavailable"
+    });
+    info.mockRestore();
   });
 
   it("stops and resets every audio element", () => {
