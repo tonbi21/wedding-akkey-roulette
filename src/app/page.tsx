@@ -1,13 +1,5 @@
-import { RouletteScreen } from "@/features/roulette/components/RouletteScreen";
-import { Ballpit } from "@/features/roulette/components/Ballpit";
-import { KEYCHAINS } from "@/features/roulette/keychains";
-import { KEYCHAIN_COUNT } from "@/features/roulette/config";
+import { IntroScreen } from "@/features/intro/components/IntroScreen";
 
 export default function Page() {
-  return (
-    <>
-      <Ballpit count={KEYCHAIN_COUNT} images={KEYCHAINS} />
-      <RouletteScreen />
-    </>
-  );
+  return <IntroScreen />;
 }
