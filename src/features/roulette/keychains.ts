@@ -9,6 +9,6 @@ export const KEYCHAINS: Keychain[] = Array.from({ length: KEYCHAIN_COUNT }, (_, 
 
   return {
     id: `keychain-${padded}`,
-    imageSrc: `${KEYCHAIN_IMAGE_BASE_PATH}/keychain-${padded}.svg`
+    imageSrc: `${KEYCHAIN_IMAGE_BASE_PATH}/keychain-${padded}.png`
   };
 });

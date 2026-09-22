@@ -71,6 +71,16 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
           : [...state.winnerIds, action.winnerId]
       };
 
+    case "RETRY":
+      if (state.phase !== "winner") return state;
+      return {
+        ...state,
+        phase: "spinning",
+        currentKeychainId: null,
+        pendingWinnerId: null,
+        winnerIds: state.winnerIds.slice(0, state.round - 1)
+      };
+
     case "NEXT":
       if (state.phase !== "winner") {
         return state;

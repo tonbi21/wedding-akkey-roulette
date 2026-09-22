@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stop後に当選画像と現行Winner演出を表示し、モノトーンの中央配置レイアウトと履歴モーダルを実現する。
+**Goal:** Stop後に当選画像と現行Winner演出を表示し、モノトーンの中央配置レイアウトと当選者モーダルを実現する。
 
-**Architecture:** STOP時にReducerが当選IDを`currentKeychainId`と`winnerIds`へ保存し、winner状態を描画する。WinnerOverlayは既存実装を再利用し、履歴だけを固定オーバーレイの中央モーダルへ変更する。配色とレイアウトは`globals.css`に集約する。
+**Architecture:** STOP時にReducerが当選IDを`currentKeychainId`と`winnerIds`へ保存し、winner状態を描画する。WinnerOverlayは既存実装を再利用し、当選者だけを固定オーバーレイの中央モーダルへ変更する。配色とレイアウトは`globals.css`に集約する。
 
 **Tech Stack:** React 19, TypeScript, CSS, Vitest, Testing Library, Next.js 16
 

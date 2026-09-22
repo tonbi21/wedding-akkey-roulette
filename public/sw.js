@@ -1,4 +1,4 @@
-const CACHE_NAME = "wedding-akkey-roulette-v6";
+const CACHE_NAME = "wedding-akkey-roulette-v9";
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
@@ -7,8 +7,8 @@ const PRECACHE_URLS = [
   "/audio/percussion_drumroll_90s.mp3?v6",
   "/audio/deceleration.mp3?v6",
   "/audio/winner.mp3?v6",
-  ...Array.from({ length: 50 }, (_, index) =>
-    `/assets/keychains/keychain-${String(index + 1).padStart(2, "0")}.svg`
+  ...Array.from({ length: 48 }, (_, index) =>
+    `/assets/keychains/keychain-${String(index + 1).padStart(2, "0")}.png`
   )
 ];
 

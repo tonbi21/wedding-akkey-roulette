@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KEYCHAINS } from "../keychains";
 import { type AssetLoadState } from "../lib/assets";
 import { AUDIO_ASSETS } from "../lib/assets";
+import { selectWinner } from "../lib/roulette";
 import { getRestoredPhase, getRestoredRound, loadGameState, PERSISTENCE_KEY, saveGameState } from "../lib/persistence";
 import { useAssetPreloader } from "../hooks/useAssetPreloader";
 import { useAudioController, type AudioController } from "../hooks/useAudioController";
@@ -27,7 +28,8 @@ export type RouletteScreenProps = {
   resolveWinnerId?: ResolveWinnerId;
 };
 
-const defaultResolveWinnerId: ResolveWinnerId = (availableIds) => availableIds[0] ?? KEYCHAINS[0].id;
+const defaultResolveWinnerId: ResolveWinnerId = (_availableIds, state) =>
+  selectWinner(KEYCHAINS, state.winnerIds).id;
 
 const getVisibleKeychain = (state: GameState): Keychain => {
   if (state.currentKeychainId) {
@@ -56,6 +58,8 @@ export function RouletteScreen({
   const [state, setState] = useState<GameState>(initialState ?? initialGameState);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [persistenceWarning, setPersistenceWarning] = useState(false);
+  const [resetError, setResetError] = useState(false);
+  const [retryError, setRetryError] = useState(false);
   const resetRequestedRef = useRef(false);
 
   const dispatch = useCallback((action: GameAction) => {
@@ -63,6 +67,23 @@ export function RouletteScreen({
   }, []);
 
   useRouletteAnimation({ dispatch, state });
+
+  const resetGame = useCallback(() => {
+    if (!window.confirm("抽選当選者を削除して、最初からやり直しますか？")) return;
+    try {
+      window.localStorage.removeItem(PERSISTENCE_KEY);
+    } catch {
+      setResetError(true);
+      return;
+    }
+    resetRequestedRef.current = true;
+    activeAudioController.stopAll();
+    setHistoryOpen(false);
+    setPersistenceWarning(false);
+    setResetError(false);
+    setRetryError(false);
+    dispatch({ type: "RESET" });
+  }, [activeAudioController, dispatch]);
 
   useEffect(() => {
     if (initialState) {
@@ -76,20 +97,11 @@ export function RouletteScreen({
     const url = new URL(window.location.href);
     if (url.searchParams.get("reset") !== "1") return;
 
-    if (window.confirm("抽選履歴を削除して、最初からやり直しますか？")) {
-      try {
-        resetRequestedRef.current = true;
-        window.localStorage.removeItem(PERSISTENCE_KEY);
-        setState(initialGameState);
-        setPersistenceWarning(false);
-      } catch {
-        setPersistenceWarning(true);
-      }
-    }
+    resetGame();
 
     url.searchParams.delete("reset");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, []);
+  }, [resetGame]);
 
   useEffect(() => {
     if (state.phase !== "boot") {
@@ -120,11 +132,11 @@ export function RouletteScreen({
   }, [activeAssetState.failedAssets.length, activeAssetState.ready, state.phase]);
 
   useEffect(() => {
-    if (state.winnerIds.length === 0 || typeof window === "undefined") return;
     if (resetRequestedRef.current) {
       resetRequestedRef.current = false;
       return;
     }
+    if (state.winnerIds.length === 0 || typeof window === "undefined") return;
     const result = saveGameState(window.localStorage, state.winnerIds, state.winnerIds.length === 3);
     setPersistenceWarning(!result.ok);
   }, [state.winnerIds]);
@@ -158,7 +170,26 @@ export function RouletteScreen({
 
   const handleNext = () => {
     if (state.phase !== "winner") return;
+    setRetryError(false);
     dispatch({ type: "NEXT" });
+  };
+
+  const handleRetry = () => {
+    if (state.phase !== "winner") return;
+    const retried = gameReducer(state, { type: "RETRY" });
+    // Save even an empty history so a reload cannot restore the cancelled first result.
+    try {
+      const result = saveGameState(window.localStorage, retried.winnerIds, false);
+      if (!result.ok) throw result.error;
+    } catch {
+      setRetryError(true);
+      return;
+    }
+    setRetryError(false);
+    setPersistenceWarning(false);
+    activeAudioController.stopAll();
+    dispatch({ type: "RETRY" });
+    void activeAudioController.startRoulette();
   };
 
   return (
@@ -172,7 +203,7 @@ export function RouletteScreen({
         <div className="roulette-stage">
           <RouletteImage
             alt="Current roulette image"
-            className="roulette-stage__image"
+            className={`roulette-stage__image${state.phase === "winner" ? " roulette-stage__image--winner-drop" : ""}`}
             keychain={visibleKeychain}
           />
           {state.phase === "winner" ? <WinnerOverlay /> : null}
@@ -186,7 +217,17 @@ export function RouletteScreen({
             読み込みエラー / Loading error
           </p>
         ) : null}
-        {persistenceWarning ? <p className="roulette-status roulette-status--error">履歴を保存できません。ページを閉じないでください。</p> : null}
+        {persistenceWarning ? <p className="roulette-status roulette-status--error">当選者を保存できません。ページを閉じないでください。</p> : null}
+        {resetError ? (
+          <p className="roulette-status roulette-status--error" role="alert">
+            当選者を削除できませんでした。もう一度お試しください。
+          </p>
+        ) : null}
+        {retryError ? (
+          <p className="roulette-status roulette-status--error" role="alert">
+            回し直しを保存できませんでした。もう一度RETRYを押してください。
+          </p>
+        ) : null}
 
         <div className="roulette-controls">
           {state.phase === "ready" ? (
@@ -197,8 +238,18 @@ export function RouletteScreen({
           {state.phase === "idle" ? <StartButton onClick={() => { void handleStart(); }} /> : null}
           {state.phase === "spinning" ? <StopButton onClick={() => { void handleStop(); }} /> : null}
           {state.phase === "winner" ? (
-            <button className="roulette-button roulette-button--secondary" onClick={() => { void handleNext(); }} type="button">
-              NEXT
+            <div className="roulette-result-actions">
+              <button className="roulette-button roulette-button--primary" onClick={handleRetry} type="button">
+                RETRY
+              </button>
+              <button className="roulette-button roulette-button--secondary" onClick={handleNext} type="button">
+                NEXT
+              </button>
+            </div>
+          ) : null}
+          {state.phase === "complete" ? (
+            <button className="roulette-button roulette-button--secondary" onClick={resetGame} type="button">
+              はじめからやり直す
             </button>
           ) : null}
         </div>
