@@ -24,14 +24,21 @@ default `node` is older.
 
 ## PWA and offline operation
 
-The app registers `/sw.js`, precaches the app shell, local icons, all 48
-keychain images, and the three audio paths. Static same-origin requests are
-cached at runtime as well. No production asset is loaded from an external URL.
+`/` is the muted video-entry route. Once the introduction completes or cannot
+play, its GAME START image enters the draw route at `/roulette`.
 
-For the release rehearsal, open the app online, wait for `ENTER`, close it,
-disable Wi-Fi, reopen the installed PWA, and complete all three rounds. The
-browser Application panel should show the service worker as activated and the
-three audio files as cached.
+The app registers `/sw.js`, precaches both route documents, the hero video,
+GAME START image, app shell, local icons, all 48 keychain images, and the three
+audio paths. Static same-origin requests are cached at runtime as well. Offline
+replay of `/roulette` is supported after entering that route online once, which
+warms its Next.js route assets; a first-ever offline visit to `/roulette` is not
+supported. No production asset is loaded from an external URL.
+
+For the release rehearsal, open the entry route online, wait for GAME START,
+enter the draw route, wait for `ENTER` to warm it, close it, disable Wi-Fi,
+reopen the installed PWA, and complete all three rounds. The browser Application
+panel should show the service worker as activated and the hero media, draw
+route, and three audio files as cached.
 
 ## Resetting rehearsal data
 
@@ -46,7 +53,7 @@ dialog to clear the saved winners and return to `ENTER`; all 48 designs become
 eligible again. Cancel leaves the results intact. If saved history cannot be
 cleared, an error is shown and the results remain available for another attempt.
 
-For a reset before completing all three rounds, open `/?reset=1` and confirm
+For a reset before completing all three rounds, open `/roulette?reset=1` and confirm
 the same dialog. The query parameter is removed from the address bar afterward.
 
 ## Transparent capsule background

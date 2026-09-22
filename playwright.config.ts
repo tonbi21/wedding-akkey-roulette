@@ -14,9 +14,9 @@ export default defineConfig({
     ...devices["Desktop Chrome"]
   },
   webServer: {
-    command: `${nodeBinary} node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3100`,
+    command: `${nodeBinary} node_modules/next/dist/bin/next build --webpack && ${nodeBinary} node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3100`,
     url: "http://127.0.0.1:3100",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000
   }
 });

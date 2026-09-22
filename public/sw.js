@@ -1,6 +1,9 @@
-const CACHE_NAME = "wedding-akkey-roulette-v9";
+const CACHE_NAME = "wedding-akkey-roulette-v10";
 const PRECACHE_URLS = [
   "/",
+  "/roulette",
+  "/media/akkey-roulette-hero-web.mp4",
+  "/media/game-start.png",
   "/manifest.webmanifest",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
@@ -49,10 +52,10 @@ self.addEventListener("fetch", (event) => {
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          void caches.open(CACHE_NAME).then((cache) => cache.put("/", copy));
+          void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match("/").then((response) => response || Response.error()))
+        .catch(() => caches.match(request).then((response) => response || caches.match("/")).then((response) => response || Response.error()))
     );
     return;
   }
