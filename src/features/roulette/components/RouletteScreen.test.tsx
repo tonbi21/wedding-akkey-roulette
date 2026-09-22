@@ -219,7 +219,7 @@ describe("RouletteScreen", () => {
 
   it("clears persisted history after confirming the hidden reset query", async () => {
     window.localStorage.setItem(PERSISTENCE_KEY, JSON.stringify({ winnerIds: ["keychain-01"], completed: false, savedAt: new Date().toISOString() }));
-    window.history.pushState({}, "", "/?reset=1");
+    window.history.pushState({}, "", "/roulette?reset=1");
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(
@@ -232,7 +232,8 @@ describe("RouletteScreen", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument());
     expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
     expect(window.location.search).toBe("");
+    expect(window.location.pathname).toBe("/roulette");
     confirm.mockRestore();
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, "", "/roulette");
   });
 });

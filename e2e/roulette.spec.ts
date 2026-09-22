@@ -32,7 +32,8 @@ test.beforeEach(async ({ page }) => {
 
     window.Audio = TestAudio as unknown as typeof Audio;
   });
-  await page.goto("/");
+  await page.goto("/roulette");
+  await expect(page).toHaveURL(/\/roulette$/);
   await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: "ENTER" }).click();
 });

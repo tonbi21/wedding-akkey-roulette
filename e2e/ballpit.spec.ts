@@ -4,7 +4,7 @@ test("renders 48 transparent image capsules without intercepting roulette contro
   await page.setViewportSize({ width: 1440, height: 1000 });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/roulette");
   const background = page.locator(".ballpit-background");
   const canvas = background.locator("canvas");
   await expect(background).toHaveAttribute("data-renderer", "webgl", { timeout: 20000 });
@@ -30,7 +30,7 @@ test("renders 48 transparent image capsules without intercepting roulette contro
 test.describe("touch device", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
   test("background taps do not block touch roulette and retry controls", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/roulette");
     await expect(page.locator(".ballpit-background")).toHaveAttribute("data-renderer", "webgl", { timeout: 20000 });
     await page.touchscreen.tap(50, 740);
     await page.getByRole("button", { name: "ENTER", exact: true }).tap();
@@ -44,7 +44,7 @@ test.describe("touch device", () => {
 
 test("reduced motion pauses the capsules and WebGL context loss keeps controls usable", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/roulette");
   const background = page.locator(".ballpit-background");
   const canvas = background.locator("canvas");
   await expect(background).toHaveAttribute("data-renderer", "webgl", { timeout: 20000 });
