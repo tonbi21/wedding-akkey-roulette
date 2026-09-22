@@ -9,13 +9,14 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("IntroScreen", () => {
-  it("reveals the supplied start image only after the hero video ends", () => {
+  it("keeps the completed hero video visible behind the supplied start image", () => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
     render(<IntroScreen />);
     const video = screen.getByTestId("hero-video");
     expect(screen.queryByRole("button", { name: "GAME START" })).not.toBeInTheDocument();
     fireEvent.ended(video);
     const start = screen.getByRole("button", { name: "GAME START" });
+    expect(screen.getByTestId("hero-video")).toBeInTheDocument();
     expect(start.querySelector("img")).toHaveAttribute("src", "/media/game-start.png");
   });
 

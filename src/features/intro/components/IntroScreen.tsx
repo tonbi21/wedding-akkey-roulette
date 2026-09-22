@@ -7,6 +7,7 @@ export function IntroScreen() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showStart, setShowStart] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const [navigating, setNavigating] = useState(false);
   const navigatingRef = useRef(false);
 
@@ -26,11 +27,12 @@ export function IntroScreen() {
 
   return (
     <main className="intro-screen" data-stage={showStart ? "start" : "video"}>
-      {!showStart ? (
-        <video ref={videoRef} data-testid="hero-video" className="intro-screen__video" autoPlay muted playsInline preload="auto" onEnded={() => setShowStart(true)} onError={() => setShowStart(true)}>
+      {!videoFailed && (
+        <video ref={videoRef} data-testid="hero-video" className="intro-screen__video" autoPlay muted playsInline preload="auto" onEnded={() => setShowStart(true)} onError={() => { setVideoFailed(true); setShowStart(true); }}>
           <source src="/media/akkey-roulette-hero-web.mp4" type="video/mp4" />
         </video>
-      ) : (
+      )}
+      {showStart && (
         <button type="button" className="intro-screen__start" aria-label="GAME START" disabled={navigating} onClick={startGame}>
           <img src="/media/game-start.png" alt="" />
         </button>

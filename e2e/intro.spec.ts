@@ -7,7 +7,14 @@ test("shows only the muted hero video before completion, then enters the roulett
   await expect(video).toHaveAttribute("playsinline", "");
   await expect(page.getByRole("button", { name: "GAME START" })).toHaveCount(0);
   await video.evaluate((element) => element.dispatchEvent(new Event("ended")));
-  await page.getByRole("button", { name: "GAME START" }).click();
+  const start = page.getByRole("button", { name: "GAME START" });
+  await expect(video).toBeVisible();
+  await expect(start).toBeVisible();
+  const startBox = await start.boundingBox();
+  expect(startBox).not.toBeNull();
+  expect(startBox!.x + startBox!.width / 2).toBeCloseTo((await page.viewportSize())!.width / 2, 1);
+  expect(startBox!.y).toBeGreaterThan((await page.viewportSize())!.height / 2);
+  await start.click();
   await expect(page).toHaveURL(/\/roulette$/);
   await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
 });
