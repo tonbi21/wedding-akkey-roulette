@@ -24,21 +24,24 @@ default `node` is older.
 
 ## PWA and offline operation
 
-`/` is the muted video-entry route. Once the introduction completes or cannot
-play, its GAME START image enters the draw route at `/roulette`.
+`/` begins with a TAP TO START image so the hero video and its retro BGM can
+start together with a browser-approved user gesture. Once the introduction
+completes or cannot play, its GAME START image enters the draw route at
+`/roulette`.
 
 The app registers `/sw.js`, precaches both route documents, the hero video,
-GAME START image, app shell, local icons, all 48 keychain images, and the three
-audio paths. Static same-origin requests are cached at runtime as well. Offline
-replay of `/roulette` is supported after entering that route online once, which
-warms its Next.js route assets; a first-ever offline visit to `/roulette` is not
-supported. No production asset is loaded from an external URL.
+TAP TO START and GAME START images, intro BGM, app shell, local icons, all 48
+keychain images, and the three roulette audio paths. Static same-origin
+requests are cached at runtime as well. Offline replay of `/roulette` is
+supported after entering that route online once, which warms its Next.js route
+assets; a first-ever offline visit to `/roulette` is not supported. No
+production asset is loaded from an external URL.
 
-For the release rehearsal, open the entry route online, wait for GAME START,
-enter the draw route, wait for `ENTER` to warm it, close it, disable Wi-Fi,
-reopen the installed PWA, and complete all three rounds. The browser Application
-panel should show the service worker as activated and the hero media, draw
-route, and three audio files as cached.
+For the release rehearsal, open the entry route online, press TAP TO START,
+wait for GAME START, enter the draw route, wait for `ENTER` to warm it, close
+it, disable Wi-Fi, reopen the installed PWA, and complete all three rounds. The
+browser Application panel should show the service worker as activated and the
+hero media, draw route, and all audio files as cached.
 
 ## Resetting rehearsal data
 

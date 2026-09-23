@@ -1,9 +1,11 @@
-const CACHE_NAME = "wedding-akkey-roulette-v10";
+const CACHE_NAME = "wedding-akkey-roulette-v11";
 const PRECACHE_URLS = [
   "/",
   "/roulette",
   "/media/akkey-roulette-hero-web.mp4",
+  "/media/tap-to-start.png",
   "/media/game-start.png",
+  "/audio/wedding_akkey_roulette_retro_game_10s.wav",
   "/manifest.webmanifest",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
