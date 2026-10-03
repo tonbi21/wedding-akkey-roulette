@@ -30,5 +30,6 @@ export type GameAction =
   | { type: "START" }
   | { type: "DISPLAY_KEYCHAIN"; keychainId: string }
   | { type: "STOP"; winnerId: string }
+  | { type: "RETRY" }
   | { type: "NEXT" }
   | { type: "RESET" };

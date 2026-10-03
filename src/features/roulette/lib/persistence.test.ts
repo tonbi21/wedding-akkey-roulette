@@ -71,6 +71,20 @@ describe("saveGameState", () => {
 });
 
 describe("loadGameState", () => {
+  it("keeps placeholder rehearsal history out of the final image draw", () => {
+    const oldPayload = JSON.stringify({
+      winnerIds: ["keychain-01", "keychain-49", "keychain-50"],
+      completed: true,
+      savedAt: "2026-08-07T12:34:56.000Z"
+    });
+    const storage: TestStorage = {
+      getItem: vi.fn((key) => key === "wedding-akkey-roulette:v1" ? oldPayload : null),
+      setItem: vi.fn()
+    };
+    expect(loadGameState(storage)).toBeNull();
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
   it("loads a persisted game state and drops the saved timestamp", () => {
     const storage = createStorage(
       JSON.stringify({

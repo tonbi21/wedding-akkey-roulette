@@ -1,4 +1,5 @@
-export const PERSISTENCE_KEY = "wedding-akkey-roulette:v1";
+// Keep the placeholder-image rehearsal history separate from the final 37 designs.
+export const PERSISTENCE_KEY = "wedding-akkey-roulette:v2";
 
 export type PersistedGameState = {
   winnerIds: string[];

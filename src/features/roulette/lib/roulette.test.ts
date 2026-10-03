@@ -3,9 +3,9 @@ import { getAvailableKeychains, selectWinner } from "./roulette";
 import type { Keychain } from "../gameTypes";
 
 const keychains: Keychain[] = [
-  { id: "keychain-01", imageSrc: "/assets/keychains/keychain-01.svg" },
-  { id: "keychain-02", imageSrc: "/assets/keychains/keychain-02.svg" },
-  { id: "keychain-03", imageSrc: "/assets/keychains/keychain-03.svg" }
+  { id: "keychain-01", imageSrc: "/assets/keychains/keychain-01.png" },
+  { id: "keychain-02", imageSrc: "/assets/keychains/keychain-02.png" },
+  { id: "keychain-03", imageSrc: "/assets/keychains/keychain-03.png" }
 ];
 
 describe("getAvailableKeychains", () => {

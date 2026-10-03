@@ -8,6 +8,28 @@ const createState = (overrides: Partial<GameState> = {}): GameState => ({
 });
 
 describe("gameReducer", () => {
+  it.each([1, 2, 3] as const)("retries round %i without removing earlier results or advancing the round", (round) => {
+    const winners = ["keychain-01", "keychain-02", "keychain-03"].slice(0, round);
+    const retried = gameReducer(createState({
+      phase: "winner", round, winnerIds: winners, currentKeychainId: winners[round - 1], assetsReady: true
+    }), { type: "RETRY" });
+    expect(retried).toMatchObject({
+      phase: "spinning", round, winnerIds: winners.slice(0, -1),
+      currentKeychainId: null, pendingWinnerId: null, assetsReady: true
+    });
+    expect(gameReducer(retried, { type: "RETRY" })).toEqual(retried);
+    const stopped = gameReducer(retried, { type: "STOP", winnerId: "keychain-48" });
+    expect(stopped.winnerIds).toEqual([...winners.slice(0, -1), "keychain-48"]);
+    expect(gameReducer(stopped, { type: "NEXT" })).toMatchObject({
+      phase: round === 3 ? "complete" : "idle", round: Math.min(round + 1, 3)
+    });
+  });
+
+  it.each(["boot", "ready", "idle", "spinning", "complete", "error"] as const)("ignores RETRY during %s", (phase) => {
+    const original = createState({ phase, winnerIds: ["keychain-01"] });
+    expect(gameReducer(original, { type: "RETRY" })).toEqual(original);
+  });
+
   it("moves from boot to ready when assets load", () => {
     const nextState = gameReducer(createState(), { type: "ASSETS_READY" });
 

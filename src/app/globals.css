@@ -37,11 +37,66 @@ img {
 }
 
 .roulette-shell {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 1rem;
   min-height: 100vh;
   padding: 2rem 1rem;
   place-items: center;
+}
+
+.ballpit-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 20% 20%, #f6faf9, transparent 65%),
+    linear-gradient(145deg, #f5f7fa, #e4e9ed 70%, #f3ece4);
+}
+
+.ballpit-canvas,
+.ballpit-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ballpit-canvas {
+  display: block;
+  visibility: hidden;
+}
+
+.ballpit-background[data-renderer="webgl"] .ballpit-canvas {
+  visibility: visible;
+}
+
+.ballpit-background[data-renderer="webgl"] .ballpit-fallback {
+  visibility: hidden;
+}
+
+.ballpit-capsule {
+  position: absolute;
+  left: var(--capsule-x);
+  top: var(--capsule-y);
+  width: var(--capsule-size);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(var(--capsule-turn));
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.95), transparent 18%),
+    radial-gradient(circle at 70% 75%, transparent 40%, rgba(168, 190, 203, 0.25) 90%);
+  box-shadow: inset -3px -4px 9px #adc1ce55, inset 2px 2px 5px #ffffffaa, 0 5px 10px #50677612;
+}
+
+.ballpit-capsule img {
+  width: 57%;
+  max-height: 70%;
+  object-fit: contain;
 }
 
 .roulette-card {
@@ -86,7 +141,45 @@ img {
 
 .roulette-stage__image {
   width: min(100%, 24rem);
-  border-radius: 1.25rem;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  /* Reserve space for the winner badge without covering the design's caption. */
+  padding-bottom: 5.5rem;
+}
+
+/* Animate the existing winner image so each draw always shows one keychain. */
+.roulette-stage__image--winner-drop {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: center bottom;
+  animation: winner-keychain-drop 1.4s both;
+}
+
+@keyframes winner-keychain-drop {
+  0% {
+    transform: translate3d(0, calc(-100vh - 100%), 0) rotate(-12deg);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  56% {
+    transform: translate3d(0, 0, 0) rotate(3deg) scale(1.03, 0.97);
+    animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+  }
+  72% {
+    transform: translate3d(0, -13%, 0) rotate(-4deg);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  84% {
+    transform: translate3d(0, 0, 0) rotate(2deg) scale(1.01, 0.99);
+    animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+  }
+  92% {
+    transform: translate3d(0, -3%, 0) rotate(-1deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
 }
 
 .roulette-overlay {
@@ -110,6 +203,7 @@ img {
 }
 
 .winner-overlay {
+  z-index: 2;
   inset: auto 1rem 1rem;
   width: auto;
   padding: 1.3rem 1.5rem 1.45rem;
@@ -135,6 +229,10 @@ img {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .roulette-stage__image--winner-drop {
+    animation: none;
+  }
+
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
@@ -175,6 +273,18 @@ img {
 
 .roulette-button--primary {
   background: #f5f5f5;
+}
+
+.roulette-result-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.roulette-result-actions .roulette-button {
+  flex: 1;
+  min-width: 0;
+  padding-inline: 1rem;
 }
 
 .roulette-button--secondary {
