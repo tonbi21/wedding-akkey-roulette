@@ -4,11 +4,11 @@ import { KEYCHAINS } from "../keychains";
 import { createCapsules } from "./capsules";
 
 describe("transparent keychain capsules", () => {
-  it("puts one distinct, uncropped image inside each of the 48 transparent spheres", () => {
+  it("puts one distinct, uncropped image inside each of the 37 transparent spheres", () => {
     const textures = KEYCHAINS.map(() => new Texture({ width: 256, height: 307 }));
     const capsules = createCapsules(KEYCHAINS, textures);
-    expect(capsules.items).toHaveLength(48);
-    expect(new Set(capsules.items.map((item) => item.group.name)).size).toBe(48);
+    expect(capsules.items).toHaveLength(37);
+    expect(new Set(capsules.items.map((item) => item.group.name)).size).toBe(37);
     capsules.items.forEach(({ shell, artwork, group }, index) => {
       expect(group.name).toBe(KEYCHAINS[index].id);
       expect(shell.geometry.type).toBe("SphereGeometry");

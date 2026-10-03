@@ -108,9 +108,9 @@ describe("RouletteScreen", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("uses a random selection across all 48 designs on STOP and excludes previous winners", () => {
+  it("uses a random selection across all 37 designs on STOP and excludes previous winners", () => {
     const random = vi.spyOn(globalThis.crypto, "getRandomValues").mockImplementation((array) => {
-      (array as Uint32Array)[0] = 47;
+      (array as Uint32Array)[0] = 36;
       return array;
     });
     const audioController: AudioController = {
@@ -128,7 +128,7 @@ describe("RouletteScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "NEXT" }));
     fireEvent.click(screen.getByRole("button", { name: "START" }));
     random.mockImplementation((array) => {
-      (array as Uint32Array)[0] = 46;
+      (array as Uint32Array)[0] = 35;
       return array;
     });
     fireEvent.click(screen.getByRole("button", { name: "STOP" }));

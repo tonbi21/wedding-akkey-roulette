@@ -50,7 +50,7 @@ async function mountBackground(width = 1200, height = 800, seed?: number) {
 }
 
 describe("Ballpit runtime lifecycle", () => {
-  it.each([1, 42, 2026])("keeps 48 enlarged capsules floating after two minutes on a narrow screen (seed %i)", async (seed) => {
+  it.each([1, 42, 2026])("keeps 37 eligible enlarged capsules floating after two minutes on a narrow screen (seed %i)", async (seed) => {
     const { controller, nextFrame } = await mountBackground(320, 844, seed);
     try {
       const scene = render.mock.calls[0][0] as Scene;
@@ -60,7 +60,7 @@ describe("Ballpit runtime lifecycle", () => {
       const moving = scene.children.filter((group, index) =>
         Math.hypot(group.position.x - positions[index].x, group.position.y - positions[index].y) > 0.25
       );
-      expect(scene.children).toHaveLength(48);
+      expect(scene.children).toHaveLength(37);
       expect(moving.length).toBeGreaterThanOrEqual(24);
     } finally { controller.dispose(); }
   });
@@ -70,11 +70,11 @@ describe("Ballpit runtime lifecycle", () => {
     const geometryDispose = vi.spyOn(SphereGeometry.prototype, "dispose");
     const { canvas, controller, unavailable } = await mountBackground();
     canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true }));
-    expect(textureDispose).toHaveBeenCalledTimes(48);
+    expect(textureDispose).toHaveBeenCalledTimes(37);
     expect(geometryDispose).toHaveBeenCalledOnce();
     expect(unavailable).toHaveBeenCalledOnce();
     controller.dispose();
-    expect(textureDispose).toHaveBeenCalledTimes(48);
+    expect(textureDispose).toHaveBeenCalledTimes(37);
   });
 
   it("a pointer tap nudges the real capsule positions even if released before the next frame", async () => {

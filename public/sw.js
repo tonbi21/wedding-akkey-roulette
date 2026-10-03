@@ -1,4 +1,8 @@
 const CACHE_NAME = "wedding-akkey-roulette-v9";
+const KEYCHAIN_NUMBERS = [
+  1, 2, 3, 4, 6, 8, 9, 10, 11, 12, 14, 15, 17, 18, 21, 22, 23, 24, 25, 26, 27,
+  29, 31, 33, 34, 35, 36, 37, 39, 40, 41, 42, 43, 44, 45, 47, 48
+];
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
@@ -7,8 +11,8 @@ const PRECACHE_URLS = [
   "/audio/percussion_drumroll_90s.mp3?v6",
   "/audio/deceleration.mp3?v6",
   "/audio/winner.mp3?v6",
-  ...Array.from({ length: 48 }, (_, index) =>
-    `/assets/keychains/keychain-${String(index + 1).padStart(2, "0")}.png`
+  ...KEYCHAIN_NUMBERS.map((number) =>
+    `/assets/keychains/keychain-${String(number).padStart(2, "0")}.png`
   )
 ];
 
