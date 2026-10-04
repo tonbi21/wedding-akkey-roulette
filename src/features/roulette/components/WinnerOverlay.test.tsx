@@ -8,7 +8,7 @@ vi.mock("canvas-confetti", () => ({ default: vi.fn() }));
 describe("WinnerOverlay", () => {
   it("shows winner copy and celebration hooks", () => {
     render(<WinnerOverlay />);
-    expect(screen.getByText("当たり")).toBeInTheDocument();
+    expect(screen.getByText("MATCH!")).toBeInTheDocument();
     expect(screen.queryByText("WINNER!")).not.toBeInTheDocument();
     expect(screen.getByTestId("winner-overlay")).toHaveClass(
       "winner-overlay",

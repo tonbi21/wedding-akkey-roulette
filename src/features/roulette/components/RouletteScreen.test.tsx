@@ -66,13 +66,12 @@ describe("RouletteScreen", () => {
     });
     render(<RouletteScreen initialState={completedState} assetState={readyAssets} />);
     fireEvent.click(screen.getByRole("button", { name: "はじめからやり直す" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "START" })).toBeInTheDocument());
     expect(screen.getByRole("main")).toHaveAttribute("data-winner-count", "0");
     expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "当選者" }));
+    fireEvent.click(screen.getByRole("button", { name: "当選者を表示" }));
     expect(screen.queryByRole("img", { name: "1回目の当選画像" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "当選者を閉じる" }));
-    fireEvent.click(screen.getByRole("button", { name: "ENTER" }));
     fireEvent.click(screen.getByRole("button", { name: "START" }));
     fireEvent.click(screen.getByRole("button", { name: "STOP" }));
     expect(screen.getByRole("main")).toHaveAttribute("data-winner-count", "1");
@@ -104,7 +103,7 @@ describe("RouletteScreen", () => {
     expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBe(stored);
     remove.mockRestore();
     fireEvent.click(screen.getByRole("button", { name: "はじめからやり直す" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "START" })).toBeInTheDocument());
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
@@ -136,10 +135,11 @@ describe("RouletteScreen", () => {
       .toHaveAttribute("src", "/assets/keychains/keychain-47.png");
   });
 
-  it("shows ENTER when the game is ready", () => {
+  it("starts the first draw from READY with one START press", () => {
     render(<RouletteScreen initialState={state({ phase: "ready", assetsReady: true })} />);
     expect(screen.getByRole("heading", { name: "Akkey Roulette" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "START" }));
+    expect(screen.getByRole("button", { name: "STOP" })).toBeInTheDocument();
   });
 
   it("shows START only in idle", () => {
@@ -154,7 +154,7 @@ describe("RouletteScreen", () => {
     expect(screen.queryByRole("button", { name: "START" })).not.toBeInTheDocument();
   });
 
-  it("shows the selected product and winner overlay after stopping", () => {
+  it("shows the selected product without a MATCH overlay after stopping", () => {
     const audioController: AudioController = {
       unlock: vi.fn(async () => undefined),
       startRoulette: vi.fn(async () => undefined),
@@ -168,7 +168,8 @@ describe("RouletteScreen", () => {
 
     expect(screen.getByRole("button", { name: "NEXT" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Current roulette image" })).toBeInTheDocument();
-    expect(screen.getByTestId("winner-overlay")).toBeInTheDocument();
+    expect(screen.queryByTestId("winner-overlay")).not.toBeInTheDocument();
+    expect(screen.queryByText("MATCH!")).not.toBeInTheDocument();
     expect(audioController.stopAll).toHaveBeenCalled();
     expect(audioController.playWinner).toHaveBeenCalled();
     expect(audioController.startDeceleration).not.toHaveBeenCalled();
@@ -202,10 +203,10 @@ describe("RouletteScreen", () => {
     expect(screen.queryByRole("button", { name: "START" })).not.toBeInTheDocument();
   });
 
-  it("opens history with images only", () => {
+  it("opens history from the MATCH RESULTS panel without a separate history button", () => {
     render(<RouletteScreen initialState={state({ phase: "idle", winnerIds: ["keychain-01"] })} />);
-    expect(screen.getByRole("button", { name: "当選者" })).toHaveTextContent("当選者");
-    fireEvent.click(screen.getByRole("button", { name: "当選者" }));
+    expect(screen.queryByRole("button", { name: "当選者" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "当選者を表示" }));
     expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
     expect(screen.getByRole("dialog")).toHaveAccessibleName("当選者");
     expect(screen.queryByText("History")).not.toBeInTheDocument();
@@ -217,9 +218,16 @@ describe("RouletteScreen", () => {
     expect(screen.queryByText("keychain-01")).not.toBeInTheDocument();
   });
 
+  it("uses the icon-only retry control and removes the old stage marker", () => {
+    render(<RouletteScreen initialState={state({ phase: "winner", currentKeychainId: "keychain-01" })} />);
+    expect(screen.getByRole("button", { name: "RETRY" })).toHaveTextContent("↻");
+    expect(screen.getByRole("button", { name: "RETRY" })).not.toHaveTextContent("RETRY");
+    expect(screen.queryByText("›››")).not.toBeInTheDocument();
+  });
+
   it("clears persisted history after confirming the hidden reset query", async () => {
     window.localStorage.setItem(PERSISTENCE_KEY, JSON.stringify({ winnerIds: ["keychain-01"], completed: false, savedAt: new Date().toISOString() }));
-    window.history.pushState({}, "", "/?reset=1");
+    window.history.pushState({}, "", "/roulette?reset=1");
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(
@@ -229,10 +237,11 @@ describe("RouletteScreen", () => {
       />
     );
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "ENTER" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "START" })).toBeInTheDocument());
     expect(window.localStorage.getItem(PERSISTENCE_KEY)).toBeNull();
     expect(window.location.search).toBe("");
+    expect(window.location.pathname).toBe("/roulette");
     confirm.mockRestore();
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, "", "/roulette");
   });
 });

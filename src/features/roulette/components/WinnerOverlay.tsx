@@ -16,7 +16,8 @@ export function WinnerOverlay() {
       className="roulette-overlay winner-overlay winner-overlay--bottom winner-overlay--celebration winner-overlay--compact winner-overlay--lower"
       data-testid="winner-overlay"
     >
-      <p className="roulette-overlay__title">当たり</p>
+      <p className="roulette-overlay__title">MATCH!</p>
+      <span className="winner-overlay__subcopy">YOU WIN A PRIZE!</span>
     </div>
   );
 }

@@ -13,9 +13,6 @@ import type { GameAction, GameState, Keychain } from "../gameTypes";
 import { gameReducer, initialGameState } from "../state/gameReducer";
 import { HistoryDialog } from "./HistoryDialog";
 import { RouletteImage } from "./RouletteImage";
-import { StartButton } from "./StartButton";
-import { StopButton } from "./StopButton";
-import { WinnerOverlay } from "./WinnerOverlay";
 
 const keychainMap = new Map(KEYCHAINS.map((keychain) => [keychain.id, keychain]));
 
@@ -144,15 +141,13 @@ export function RouletteScreen({
   const visibleKeychain = useMemo(() => getVisibleKeychain(state), [state]);
   const historyKeychains = useMemo(() => getHistoryKeychains(state.winnerIds), [state.winnerIds]);
 
-  const handleEnter = () => {
-    if (state.phase !== "ready") return;
-    dispatch({ type: "ENTER" });
-    void activeAudioController.unlock();
-  };
-
   const handleStart = () => {
-    if (state.phase !== "idle") return;
+    if (state.phase !== "ready" && state.phase !== "idle") return;
+    if (state.phase === "ready") {
+      dispatch({ type: "ENTER" });
+    }
     dispatch({ type: "START" });
+    void activeAudioController.unlock();
     void activeAudioController.startRoulette();
   };
 
@@ -193,69 +188,108 @@ export function RouletteScreen({
   };
 
   return (
-    <main className="roulette-shell" data-phase={state.phase} data-winner-count={state.winnerIds.length}>
-      <section className="roulette-card">
-        <header className="roulette-header">
-          <p className="roulette-header__eyebrow">Wedding Lucky Draw</p>
-          <h1 className="roulette-header__title">Akkey Roulette</h1>
-        </header>
+    <main className="arcade-mock arcade-live" data-phase={state.phase} data-winner-count={state.winnerIds.length}>
+      <header className="arcade-mock__logo">
+        <h1 aria-label="Akkey Roulette">
+          <img alt="WEDDING AKKEY-ROULETTE" src="/media/akkey-roulette-title.png" />
+        </h1>
+      </header>
 
-        <div className="roulette-stage">
-          <RouletteImage
-            alt="Current roulette image"
-            className={`roulette-stage__image${state.phase === "winner" ? " roulette-stage__image--winner-drop" : ""}`}
-            keychain={visibleKeychain}
-          />
-          {state.phase === "winner" ? <WinnerOverlay /> : null}
-        </div>
+      <section className="arcade-mock__console" aria-label="Akkey roulette">
+        <section className="arcade-mock__game">
+          <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--tl" />
+          <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--tr" />
+          <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--bl" />
+          <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--br" />
 
-        {state.phase === "boot" ? (
-          <p className="roulette-status">読み込み中 / Loading</p>
-        ) : null}
-        {state.phase === "error" ? (
-          <p className="roulette-status roulette-status--error" role="alert">
-            読み込みエラー / Loading error
-          </p>
-        ) : null}
-        {persistenceWarning ? <p className="roulette-status roulette-status--error">当選者を保存できません。ページを閉じないでください。</p> : null}
-        {resetError ? (
-          <p className="roulette-status roulette-status--error" role="alert">
-            当選者を削除できませんでした。もう一度お試しください。
-          </p>
-        ) : null}
-        {retryError ? (
-          <p className="roulette-status roulette-status--error" role="alert">
-            回し直しを保存できませんでした。もう一度RETRYを押してください。
-          </p>
-        ) : null}
+          <div className="arcade-mock__game-topline">
+            <strong>PLAY COUNT {state.round} / 3</strong>
+          </div>
 
-        <div className="roulette-controls">
-          {state.phase === "ready" ? (
-            <button className="roulette-button roulette-button--primary" onClick={() => { void handleEnter(); }} type="button">
-              ENTER
-            </button>
-          ) : null}
-          {state.phase === "idle" ? <StartButton onClick={() => { void handleStart(); }} /> : null}
-          {state.phase === "spinning" ? <StopButton onClick={() => { void handleStop(); }} /> : null}
-          {state.phase === "winner" ? (
-            <div className="roulette-result-actions">
-              <button className="roulette-button roulette-button--primary" onClick={handleRetry} type="button">
-                RETRY
-              </button>
-              <button className="roulette-button roulette-button--secondary" onClick={handleNext} type="button">
-                NEXT
-              </button>
-            </div>
-          ) : null}
-          {state.phase === "complete" ? (
-            <button className="roulette-button roulette-button--secondary" onClick={resetGame} type="button">
-              はじめからやり直す
-            </button>
-          ) : null}
-        </div>
+          <div className="arcade-mock__viewport roulette-stage">
+            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--tl" />
+            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--tr" />
+            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--bl" />
+            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--br" />
+
+            {state.phase === "boot" ? <p className="arcade-live__loading">NOW LOADING...</p> : null}
+            {state.phase === "error" ? <p className="arcade-live__loading" role="alert">LOADING ERROR</p> : null}
+            {state.phase === "ready" || state.phase === "idle" ? (
+              <>
+                <div aria-hidden="true" className="arcade-mock__mystery"><b>?</b></div>
+                <p>READY?</p>
+                <p className="arcade-mock__hint">手元のアクキーと同じ絵柄が出たら当たり！</p>
+              </>
+            ) : null}
+            {state.phase === "spinning" || state.phase === "winner" ? (
+              <div className="arcade-live__keychain-display">
+                <RouletteImage
+                  alt="Current roulette image"
+                  className="roulette-stage__image"
+                  keychain={visibleKeychain}
+                />
+              </div>
+            ) : null}
+            {state.phase === "complete" ? (
+              <div className="arcade-live__complete">
+                <p>COMPLETE!</p>
+                <span>THANK YOU FOR PLAYING!</span>
+              </div>
+            ) : null}
+          </div>
+
+          {persistenceWarning ? <p className="arcade-live__status" role="alert">当選者を保存できません。ページを閉じないでください。</p> : null}
+          {resetError ? <p className="arcade-live__status" role="alert">当選者を削除できませんでした。もう一度お試しください。</p> : null}
+          {retryError ? <p className="arcade-live__status" role="alert">回し直しを保存できませんでした。もう一度RETRYを押してください。</p> : null}
+
+          <div className="arcade-live__controls">
+            {state.phase === "ready" || state.phase === "idle" ? (
+              <button aria-label="START" className="arcade-mock__start" onClick={handleStart} type="button"><i>▶</i>START</button>
+            ) : null}
+            {state.phase === "spinning" ? (
+              <button aria-label="STOP" className="arcade-live__button arcade-live__button--stop" onClick={handleStop} type="button"><i>■</i>STOP</button>
+            ) : null}
+            {state.phase === "winner" ? (
+              <div className="arcade-live__result-actions">
+                <button aria-label="RETRY" className="arcade-live__button arcade-live__button--retry" onClick={handleRetry} type="button">↻</button>
+                <button aria-label="NEXT" className="arcade-live__button arcade-live__button--next" onClick={handleNext} type="button"><i>▶</i>NEXT</button>
+              </div>
+            ) : null}
+            {state.phase === "complete" ? (
+              <button aria-label="はじめからやり直す" className="arcade-live__button arcade-live__button--next" onClick={resetGame} type="button"><i>▶</i>PLAY AGAIN</button>
+            ) : null}
+          </div>
+        </section>
+
+        <aside
+          aria-label="当選者を表示"
+          className="arcade-mock__prizes arcade-live__results-trigger"
+          onClick={() => setHistoryOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setHistoryOpen(true);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+        >
+          <h2>MATCH RESULTS</h2>
+          <ol>
+            {[1, 2, 3].map((round) => {
+              const winner = historyKeychains[round - 1];
+              return (
+                <li className={winner ? "arcade-live__result is-winner" : "arcade-live__result"} key={round}>
+                  <strong>ROUND<br />0{round}</strong>
+                  {winner ? <RouletteImage alt={`Round ${round} result`} className="arcade-live__result-image" keychain={winner} /> : <span className="arcade-mock__prize-unknown">?</span>}
+                </li>
+              );
+            })}
+          </ol>
+        </aside>
       </section>
-
       <HistoryDialog
+        hideTrigger
         onClose={() => setHistoryOpen(false)}
         onOpen={() => setHistoryOpen(true)}
         open={historyOpen}

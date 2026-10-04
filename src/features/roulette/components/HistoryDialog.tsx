@@ -7,9 +7,10 @@ type HistoryDialogProps = {
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
+  hideTrigger?: boolean;
 };
 
-export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogProps) {
+export function HistoryDialog({ winners, open, onOpen, onClose, hideTrigger = false }: HistoryDialogProps) {
   useEffect(() => {
     if (!open) return;
 
@@ -22,9 +23,11 @@ export function HistoryDialog({ winners, open, onOpen, onClose }: HistoryDialogP
 
   return (
     <>
-      <button aria-label="当選者" className="history-button" onClick={onOpen} type="button">
-        当選者
-      </button>
+      {hideTrigger ? null : (
+        <button aria-label="当選者" className="history-button" onClick={onOpen} type="button">
+          当選者
+        </button>
+      )}
       {open ? (
         <div className="history-dialog-backdrop" onClick={onClose} role="presentation">
           <section

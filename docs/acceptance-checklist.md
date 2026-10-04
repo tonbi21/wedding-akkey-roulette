@@ -2,11 +2,15 @@
 
 ## Automated checks
 
-- [x] Unit/component tests pass (`86` tests).
+- [x] Unit/component tests pass (`92` tests).
 - [x] TypeScript typecheck passes.
 - [x] Local lint passes, including no external asset URLs and no `Math.random`.
 - [x] Webpack production build passes with Node.js 20+.
-- [x] Playwright Chromium E2E passes (`16` tests): three rounds, duplicate START protection, reload restoration, all 48 PNGs, desktop/mobile winner drop, reduced motion, reset/restart, per-round RETRY, transparent capsule background, touch controls and WebGL context-loss fallback.
+- [x] Playwright Chromium production E2E passes (`20/20` tests): three rounds, duplicate START protection, reload restoration, all 48 PNGs, desktop/mobile winner drop, reduced motion, reset/restart, per-round RETRY, transparent capsule background, touch controls, WebGL context-loss fallback, and the entry/cache/offline checks below.
+- [x] Playwright entry E2E confirms TAP TO START begins the muted hero video and BGM together; completion enters `/roulette` and exposes `ENTER`.
+- [x] Playwright entry E2E confirms the GAME START image is used after a video error, has no animation when reduced motion is requested, and stays in the mobile viewport.
+- [x] Playwright entry E2E confirms service-worker cache `wedding-akkey-roulette-v12` contains `/`, `/roulette`, the hero video, both start images, and the intro BGM.
+- [x] An online-warmed `/roulette` navigation returns its requested route from the service-worker cache before falling back to `/`; cold first-route offline support is not claimed.
 
 ## Capsule background
 
@@ -32,8 +36,11 @@
 ## Offline/PWA rehearsal
 
 - [ ] Install the PWA from the online origin in landscape mode.
-- [ ] Confirm `/sw.js` is activated and the keychain/audio assets are cached.
-- [ ] Close the PWA, disable Wi-Fi or enable airplane mode, and reopen it.
+- [ ] Confirm `/sw.js` is activated and the entry media, `/roulette`, keychain, and audio assets are cached.
+- [ ] Confirm TAP TO START begins the muted video and intro BGM together, with no visible GAME START control until the video finishes; force a video error and confirm the GAME START image appears.
+- [ ] Enable reduced motion and confirm the GAME START image does not blink; confirm both entry states remain visible at mobile width.
+- [ ] Enter `/roulette` online and wait for `ENTER` before closing the PWA to warm its Next.js route assets; cold first-route offline support is not required.
+- [ ] Close the warmed PWA, disable Wi-Fi or enable airplane mode, and reopen it.
 - [ ] Complete all three rounds offline and confirm no further START button is shown.
 - [ ] Reopen offline and confirm the completed history remains available.
 
@@ -44,5 +51,5 @@
 - [x] After the third result and `NEXT`, confirm `はじめからやり直す` clears history and returns to `ENTER`.
 - [x] Cancelling reset preserves the completed results; new results persist after a confirmed reset.
 - [x] A storage deletion error preserves results and allows retry (component test).
-- [ ] Open `/?reset=1` and confirm the reset dialog.
+- [ ] Open `/roulette?reset=1` and confirm the reset dialog.
 - [ ] Confirm the query is removed and the app returns to `ENTER` after loading.
