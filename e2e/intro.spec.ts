@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("starts the muted hero video and BGM after TAP TO START, then enters the roulette route", async ({ page }) => {
+test("starts the muted hero video and BGM after TAP TO START, then shows instructions before the roulette", async ({ page }) => {
   await page.goto("/");
   const video = page.getByTestId("hero-video");
   const audio = page.getByTestId("intro-audio");
@@ -9,6 +9,8 @@ test("starts the muted hero video and BGM after TAP TO START, then enters the ro
   await expect(video).toHaveAttribute("playsinline", "");
   await expect(tap.locator("img")).toHaveAttribute("src", "/media/tap-to-start.png");
   await expect(page.getByRole("button", { name: "GAME START" })).toHaveCount(0);
+  const tapBox = await tap.boundingBox();
+  expect(tapBox).not.toBeNull();
   await tap.click();
   await expect(tap).toHaveCount(0);
   await expect.poll(() => video.evaluate((element) => !element.paused)).toBe(true);
@@ -21,10 +23,15 @@ test("starts the muted hero video and BGM after TAP TO START, then enters the ro
   const startBox = await start.boundingBox();
   expect(startBox).not.toBeNull();
   expect(startBox!.x + startBox!.width / 2).toBeCloseTo((await page.viewportSize())!.width / 2, 1);
-  expect(startBox!.y).toBeGreaterThan((await page.viewportSize())!.height / 2);
+  expect(startBox!.x + startBox!.width / 2).toBeCloseTo(tapBox!.x + tapBox!.width / 2, 1);
+  expect(startBox!.y + startBox!.height).toBeCloseTo(tapBox!.y + tapBox!.height, 1);
   await start.click();
   await expect(page).toHaveURL(/\/roulette$/);
-  await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "HOW TO PLAY" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ROULETTE START" })).toBeVisible();
+  await page.getByRole("button", { name: "ROULETTE START" }).click();
+  await expect(page).toHaveURL(/\/roulette\/play$/);
+  await expect(page.getByRole("button", { name: "START" })).toBeVisible();
 });
 
 test("uses the start image after a video error and respects reduced motion", async ({ page }) => {
@@ -53,16 +60,16 @@ test("replays an online-warmed roulette route offline", async ({ page }) => {
   });
   await expect.poll(() => page.evaluate(async () => {
     const cachesForApp = await caches.keys();
-    const cache = await caches.open(cachesForApp.find((name) => name === "wedding-akkey-roulette-v11")!);
-    const matches = await Promise.all(["/", "/roulette", "/media/akkey-roulette-hero-web.mp4", "/media/tap-to-start.png", "/media/game-start.png", "/audio/wedding_akkey_roulette_retro_game_10s.wav"].map((path) => cache.match(path)));
+    const cache = await caches.open(cachesForApp.find((name) => name === "wedding-akkey-roulette-v13")!);
+    const matches = await Promise.all(["/", "/roulette", "/roulette/play", "/media/akkey-roulette-hero-web.mp4", "/media/tap-to-start.png", "/media/game-start.png", "/audio/wedding_akkey_roulette_retro_game_10s.mp3"].map((path) => cache.match(path)));
     return matches.every(Boolean);
   })).toBe(true);
-  await page.goto("/roulette");
-  await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
+  await page.goto("/roulette/play");
+  await expect(page.getByRole("button", { name: "START" })).toBeVisible();
   await page.context().setOffline(true);
   try {
-    await page.goto("/roulette");
-    await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
+    await page.goto("/roulette/play");
+    await expect(page.getByRole("button", { name: "START" })).toBeVisible();
   } finally {
     await page.context().setOffline(false);
   }

@@ -32,10 +32,41 @@ test.beforeEach(async ({ page }) => {
 
     window.Audio = TestAudio as unknown as typeof Audio;
   });
-  await page.goto("/roulette");
-  await expect(page).toHaveURL(/\/roulette$/);
-  await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible({ timeout: 20_000 });
-  await page.getByRole("button", { name: "ENTER" }).click();
+  await page.goto("/roulette/play");
+  await expect(page).toHaveURL(/\/roulette\/play$/);
+  await expect(page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" })).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("button", { name: "START" })).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("PLAY COUNT 1 / 3", { exact: true })).toBeVisible();
+  await expect(page.locator(".roulette-stage")).toHaveCSS("background-color", "rgb(7, 7, 7)");
+  await expect(page.getByText("›››")).toHaveCount(0);
+  const titleBounds = await page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" }).boundingBox();
+  const consoleBounds = await page.locator(".arcade-mock__console").boundingBox();
+  expect(titleBounds).not.toBeNull();
+  expect(consoleBounds).not.toBeNull();
+  expect(titleBounds!.x + titleBounds!.width / 2).toBeCloseTo(consoleBounds!.x + consoleBounds!.width / 2, 0);
+  expect(consoleBounds!.y - (titleBounds!.y + titleBounds!.height)).toBeGreaterThan(28);
+  const playCountBounds = await page.getByText("PLAY COUNT 1 / 3", { exact: true }).boundingBox();
+  const stageBounds = await page.locator(".roulette-stage").boundingBox();
+  expect(playCountBounds).not.toBeNull();
+  expect(stageBounds).not.toBeNull();
+  expect(playCountBounds!.x + playCountBounds!.width).toBeCloseTo(stageBounds!.x + stageBounds!.width, 0);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
+  await expect(page.locator(".ballpit")).toHaveCount(0);
+});
+
+test("keeps the READY prompt close to its keychain silhouette", async ({ page }) => {
+  const mysteryBounds = await page.locator(".arcade-mock__mystery").boundingBox();
+  const readyBounds = await page.getByText("READY?", { exact: true }).boundingBox();
+
+  expect(mysteryBounds).not.toBeNull();
+  expect(readyBounds).not.toBeNull();
+  expect(readyBounds!.y - (mysteryBounds!.y + mysteryBounds!.height)).toBeLessThanOrEqual(8);
+});
+
+test("does not expose the retired roulette_ver2 mock route", async ({ page }) => {
+  const response = await page.goto("/roulette_ver2");
+
+  expect(response?.status()).toBe(404);
 });
 
 async function completeRound(page: Page, expectIdle = true) {
@@ -61,7 +92,7 @@ test("completes three rounds and preserves a three-image history", async ({ page
 
   await expect(page.locator("main")).toHaveAttribute("data-phase", "complete");
   await expect(page.getByRole("button", { name: "START" })).toHaveCount(0);
-  await page.getByRole("button", { name: "当選者", exact: true }).click();
+  await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("dialog").getByRole("img")).toHaveCount(3);
 });
@@ -94,14 +125,12 @@ test("completed draw can be cancelled or reset, and the next draw survives reloa
 
   page.once("dialog", (dialog) => dialog.accept());
   await reset.click();
-  await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "START" })).toBeVisible();
   await expect(app).toHaveAttribute("data-winner-count", "0");
-  await page.getByRole("button", { name: "当選者", exact: true }).click();
+  await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("img")).toHaveCount(0);
   await page.getByRole("button", { name: "当選者を閉じる" }).click();
   await page.reload();
-  await expect(page.getByRole("button", { name: "ENTER" })).toBeVisible();
-  await page.getByRole("button", { name: "ENTER" }).click();
   await completeRound(page);
   await page.reload();
   await expect(app).toHaveAttribute("data-phase", "idle");
@@ -112,7 +141,7 @@ test("reload restores the next round from persisted history", async ({ page }) =
   await completeRound(page);
   await page.reload();
   await expect(page.getByRole("button", { name: "START" })).toBeVisible({ timeout: 20_000 });
-  await page.getByRole("button", { name: "当選者", exact: true }).click();
+  await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("img")).toHaveCount(1);
 });
 
@@ -134,7 +163,7 @@ test("each round can be retried repeatedly without changing earlier winners", as
       await expect(app).toHaveAttribute("data-phase", "spinning");
       await expect(app).toHaveAttribute("data-winner-count", String(round - 1));
       await expect(page.getByTestId("winner-overlay")).toHaveCount(0);
-      await page.getByRole("button", { name: "当選者", exact: true }).click();
+      await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
       expect(await page.getByRole("dialog").getByRole("img").evaluateAll((images) =>
         images.map((image) => image.getAttribute("src")))).toEqual(accepted);
       await page.getByRole("button", { name: "当選者を閉じる" }).click();
@@ -176,22 +205,48 @@ test("all 48 final PNGs decode and the draw only uses final images", async ({ pa
   expect(sizes.every(({ width, height }) => width > 0 && height > 0)).toBe(true);
   const image = page.getByRole("img", { name: "Current roulette image" });
   const finalImage = /^\/assets\/keychains\/keychain-(0[1-9]|[1-3][0-9]|4[0-8])\.png$/;
-  await expect(image).toHaveAttribute("src", finalImage);
   await page.getByRole("button", { name: "START" }).click();
+  await expect(image).toHaveAttribute("src", finalImage);
   await page.getByRole("button", { name: "STOP" }).click();
   await expect(image).toHaveAttribute("src", finalImage);
-  await page.getByRole("button", { name: "当選者", exact: true }).click();
+  await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("img")).toHaveAttribute("src", await image.getAttribute("src") as string);
 });
 
+test("keeps keychain surfaces square and uses frame-aligned corners", async ({ page }) => {
+  const app = page.locator("main");
+  await page.getByRole("button", { name: "START" }).click();
+  await page.getByRole("button", { name: "STOP" }).click();
+
+  const keychainSurface = await page.locator(".arcade-live__keychain-display").boundingBox();
+  const resultSurface = await page.locator(".arcade-live__result-image").first().boundingBox();
+  const unknownSurface = await page.locator(".arcade-mock__prize-unknown").first().boundingBox();
+  expect(keychainSurface).not.toBeNull();
+  expect(resultSurface).not.toBeNull();
+  expect(unknownSurface).not.toBeNull();
+  expect(keychainSurface!.width).toBeCloseTo(keychainSurface!.height, 0);
+  expect(keychainSurface!.width).toBeGreaterThan(310);
+  expect(resultSurface!.width).toBeCloseTo(resultSurface!.height, 0);
+  expect(resultSurface!.width).toBeCloseTo(unknownSurface!.width, 0);
+  await expect(page.getByText("---", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("img", { name: "Current roulette image" })).toHaveCSS("filter", "none");
+  await expect(page.locator(".arcade-mock__corner")).toHaveText(["", "", "", ""]);
+  const retryStyles = await app.getByRole("button", { name: "RETRY" }).evaluate((button) => ({
+    alignItems: getComputedStyle(button).alignItems,
+    display: getComputedStyle(button).display,
+    fontSize: Number.parseFloat(getComputedStyle(button).fontSize)
+  }));
+  expect(retryStyles.display).toBe("grid");
+  expect(retryStyles.alignItems).toBe("center");
+  expect(retryStyles.fontSize).toBeGreaterThan(30);
+});
+
 for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
-  test(`drops one winner from above the viewport and bounces into place at ${viewport.width}px`, async ({ page }, testInfo) => {
+  test(`shows the stopped winner without a drop animation at ${viewport.width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     const app = page.locator("main");
     const image = app.getByRole("img", { name: "Current roulette image" });
-    const restingBounds = await image.boundingBox();
-    expect(restingBounds).not.toBeNull();
 
     for (let round = 1; round <= 2; round++) {
       await app.getByRole("button", { name: "START" }).click();
@@ -203,74 +258,31 @@ for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 
       await expect(app).toHaveAttribute("data-phase", "winner");
       await expect(app).toHaveAttribute("data-winner-count", String(round));
       await expect(page.locator(".roulette-stage img")).toHaveCount(1);
-
-      const positions = await image.evaluate((element) => {
-        const animations = element.getAnimations();
-        if (animations.length !== 1) throw new Error(`Expected one drop animation, got ${animations.length}`);
-        const animation = animations[0];
-        animation.pause();
-        const duration = Number(animation.effect!.getComputedTiming().duration);
-        animation.currentTime = 0;
-        const startBottom = element.getBoundingClientRect().bottom;
-        animation.currentTime = duration * 0.56;
-        const landingTop = element.getBoundingClientRect().top;
-        animation.currentTime = duration * 0.72;
-        const bounceTop = element.getBoundingClientRect().top;
-        animation.finish();
-        const end = element.getBoundingClientRect();
-        return { startBottom, landingTop, bounceTop, endTop: end.top, endWidth: end.width };
-      });
-
-      expect(positions.startBottom).toBeLessThan(0);
-      expect(positions.bounceTop).toBeLessThan(positions.landingTop);
-      expect(positions.endTop).toBeCloseTo(restingBounds!.y, 0);
-      expect(positions.endWidth).toBeCloseTo(restingBounds!.width, 0);
-      await expect(page.getByTestId("winner-overlay")).toBeVisible();
-      const contentBottom = await image.evaluate((element) =>
-        element.getBoundingClientRect().bottom - parseFloat(getComputedStyle(element).paddingBottom)
-      );
-      const badgeBounds = await page.getByTestId("winner-overlay").boundingBox();
-      expect(contentBottom).toBeLessThanOrEqual(badgeBounds!.y);
+      expect(await image.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await expect(page.getByTestId("winner-overlay")).toHaveCount(0);
+      await expect(page.getByText("MATCH!")).toHaveCount(0);
       if (round === 1) {
-        const fallingBounds = await image.evaluate(async (element) => {
-          const animation = element.getAnimations()[0];
-          animation.pause();
-          await animation.ready;
-          animation.currentTime = Number(animation.effect!.getComputedTiming().duration) * 0.52;
-          const bounds = element.getBoundingClientRect();
-          return { top: bounds.top, bottom: bounds.bottom };
-        });
-        expect(fallingBounds.top).toBeLessThan(restingBounds!.y);
-        expect(fallingBounds.bottom).toBeGreaterThan(0);
-        await page.screenshot({ path: testInfo.outputPath("winner-falling.png") });
-        await image.evaluate((element) => element.getAnimations()[0].finish());
-        await page.screenshot({ path: testInfo.outputPath("winner-landed.png") });
+        await page.screenshot({ path: testInfo.outputPath("winner-stopped.png") });
       }
       await app.getByRole("button", { name: "NEXT" }).click();
       await expect(app).toHaveAttribute("data-phase", "idle");
-      expect(await image.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await expect(page.locator(".roulette-stage img")).toHaveCount(0);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
   });
 }
 
-test("NEXT cancels a drop in progress without leaving an extra image", async ({ page }) => {
+test("NEXT clears the stopped image without leaving an extra image", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.getByRole("button", { name: "START" }).click();
   await page.getByRole("button", { name: "STOP" }).click();
-  const image = page.getByRole("img", { name: "Current roulette image" });
-  await image.evaluate((element) => {
-    const animation = element.getAnimations()[0];
-    animation.pause();
-    animation.currentTime = 400;
-  });
   await page.getByRole("button", { name: "NEXT", exact: true }).click();
-  expect(await image.evaluate((element) => element.getAnimations().length)).toBe(0);
-  await expect(page.locator(".roulette-stage img")).toHaveCount(1);
-  await expect(image).toBeInViewport();
+  await expect(page.locator(".roulette-stage img")).toHaveCount(0);
+  await expect(page.getByText("READY?")).toBeVisible();
 });
 
-test("reduced motion shows the winner immediately without dropping", async ({ page }) => {
+test("reduced motion keeps the winner static after stopping", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.getByRole("button", { name: "START" }).click();
   await page.getByRole("button", { name: "STOP" }).click();
@@ -278,5 +290,5 @@ test("reduced motion shows the winner immediately without dropping", async ({ pa
   await expect(page.locator(".roulette-stage img")).toHaveCount(1);
   await expect(image).toBeInViewport();
   expect(await image.evaluate((element) => element.getAnimations().length)).toBe(0);
-  await expect(page.getByTestId("winner-overlay")).toBeVisible();
+  await expect(page.getByTestId("winner-overlay")).toHaveCount(0);
 });

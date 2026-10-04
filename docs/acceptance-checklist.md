@@ -9,7 +9,7 @@
 - [x] Playwright Chromium production E2E passes (`20/20` tests): three rounds, duplicate START protection, reload restoration, all 48 PNGs, desktop/mobile winner drop, reduced motion, reset/restart, per-round RETRY, transparent capsule background, touch controls, WebGL context-loss fallback, and the entry/cache/offline checks below.
 - [x] Playwright entry E2E confirms TAP TO START begins the muted hero video and BGM together; completion enters `/roulette` and exposes `ENTER`.
 - [x] Playwright entry E2E confirms the GAME START image is used after a video error, has no animation when reduced motion is requested, and stays in the mobile viewport.
-- [x] Playwright entry E2E confirms service-worker cache `wedding-akkey-roulette-v11` contains `/`, `/roulette`, the hero video, both start images, and the intro BGM.
+- [x] Playwright entry E2E confirms service-worker cache `wedding-akkey-roulette-v12` contains `/`, `/roulette`, the hero video, both start images, and the intro BGM.
 - [x] An online-warmed `/roulette` navigation returns its requested route from the service-worker cache before falling back to `/`; cold first-route offline support is not claimed.
 
 ## Capsule background

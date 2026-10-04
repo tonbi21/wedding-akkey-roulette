@@ -41,7 +41,7 @@ export function IntroScreen() {
           <source src="/media/akkey-roulette-hero-web.mp4" type="video/mp4" />
         </video>
       )}
-      <audio ref={audioRef} data-testid="intro-audio" preload="auto" src="/audio/wedding_akkey_roulette_retro_game_10s.wav" />
+      <audio ref={audioRef} data-testid="intro-audio" preload="auto" src="/audio/wedding_akkey_roulette_retro_game_10s.mp3" />
       {!hasStarted && !showStart && (
         <button type="button" className="intro-screen__tap" aria-label="TAP TO START" onClick={beginIntro}>
           <img src="/media/tap-to-start.png" alt="" />
