@@ -69,6 +69,15 @@ test("does not expose the retired roulette_ver2 mock route", async ({ page }) =>
   expect(response?.status()).toBe(404);
 });
 
+test("keeps MATCH RESULTS visibly focused for keyboard users", async ({ page }) => {
+  const resultsTrigger = page.locator(".arcade-live__results-trigger");
+
+  await resultsTrigger.focus();
+
+  await expect(resultsTrigger).toHaveCSS("outline-color", "rgb(70, 242, 62)");
+  await expect(resultsTrigger).toHaveCSS("outline-width", "4px");
+});
+
 async function completeRound(page: Page, expectIdle = true) {
   const app = page.locator("main");
   await app.getByRole("button", { name: "START" }).click();

@@ -1,0 +1,114 @@
+/* Winner history dialog and its optional trigger. */
+.history-dialog-backdrop {
+position: fixed;
+inset: 0;
+z-index: 20;
+display: grid;
+place-items: center;
+padding: 1.5rem;
+background: rgba(0, 0, 0, 0.58);
+}
+
+.history-dialog {
+width: min(94vw, 56rem);
+max-height: calc(100vh - 4rem);
+overflow: auto;
+padding: 1.5rem 1.75rem 1.75rem;
+border: 1px solid #cccccc;
+border-radius: 1.25rem;
+background: #ffffff;
+color: #1a1a1a;
+box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+}
+
+.history-dialog--expanded {
+width: min(94vw, 60rem);
+}
+
+.history-dialog__heading {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.history-dialog__title {
+margin: 0;
+font-size: 1.25rem;
+}
+
+.history-dialog__heading button {
+display: grid;
+flex: none;
+place-items: center;
+width: 2rem;
+height: 2rem;
+border: 1px solid #999999;
+border-radius: 50%;
+background: transparent;
+color: #1a1a1a;
+font-size: 1.25rem;
+line-height: 1;
+padding: 0;
+cursor: pointer;
+}
+
+.history-dialog__close-icon {
+display: block;
+width: 0.9rem;
+height: 0.9rem;
+}
+
+.history-dialog__close-icon path {
+fill: none;
+stroke: currentColor;
+stroke-linecap: round;
+stroke-width: 2.25;
+}
+
+.history-dialog__grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 15rem));
+gap: 1.25rem;
+justify-content: center;
+margin-top: 1.5rem;
+}
+
+.history-dialog__item {
+width: min(100%, 15rem);
+justify-self: center;
+border-radius: 1rem;
+overflow: hidden;
+background: #f0f0f0;
+color: #333333;
+}
+
+.history-dialog__item p {
+margin: 0;
+padding: 0.7rem 0.85rem;
+font-weight: 700;
+}
+
+.history-dialog__image {
+width: 100%;
+}
+
+.history-dialog__image--inset {
+width: calc(100% - 1.5rem);
+margin: 0 0.75rem 0.75rem;
+border-radius: 0.75rem;
+}
+
+.arcade-live .history-button {
+justify-self: center;
+border: 3px solid #090909;
+border-radius: .45rem;
+background: #fff;
+color: #090909;
+box-shadow: .18rem .18rem 0 #090909;
+font-family: inherit;
+}
+
+.arcade-live .history-button:active {
+transform: translate(.12rem, .12rem);
+box-shadow: .06rem .06rem 0 #090909;
+}

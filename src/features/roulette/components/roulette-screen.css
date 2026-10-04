@@ -1,0 +1,729 @@
+/* Roulette screen structural base, states, and responsive rules. */
+/* Alternate mock: black-and-white arcade panel inspired by the four-state reference. */
+.arcade-mock {
+min-height: 100vh;
+display: grid;
+align-content: center;
+gap: clamp(.75rem, 2vw, 1.25rem);
+padding: clamp(1rem, 3vw, 3rem);
+color: #090909;
+background: #fbfbf8;
+font-family: "Arial Black", Impact, "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+.arcade-mock__logo {
+display: grid;
+justify-items: center;
+text-align: center;
+}
+.arcade-mock__logo img {
+width: min(100%, 38rem);
+height: auto;
+}
+
+.arcade-mock__console {
+width: min(100%, 80rem);
+margin: 0 auto;
+display: grid;
+grid-template-columns: minmax(0, 1fr) minmax(14rem, .32fr);
+gap: clamp(.55rem, 1.4vw, 1.1rem);
+align-items: stretch;
+}
+.arcade-mock__game,.arcade-mock__prizes {
+border: clamp(3px, .45vw, 6px) solid #080808;
+border-radius: .6rem;
+background: #fff;
+box-shadow: .32rem .32rem 0 #d7d7d2;
+}
+.arcade-mock__game {
+position: relative;
+display: grid;
+grid-template-rows: auto 1fr auto;
+padding: clamp(.7rem, 1.5vw, 1.25rem);
+min-height: min(68vh, 39rem);
+}
+
+.arcade-mock__screw {
+position: absolute;
+z-index: 2;
+width: clamp(.55rem, 1.3vw, .85rem);
+aspect-ratio: 1;
+border: 1px solid #111;
+border-radius: 50%;
+background: radial-gradient(circle at 35% 32%, #fff 0 14%, #9a9a9a 18% 43%, #282828 48% 72%, #030303 76%);
+box-shadow: inset -.06rem -.06rem 0 #000, .04rem .04rem 0 #d6d6d0;
+}
+.arcade-mock__screw::after {
+content: "";
+position: absolute;
+top: 44%;
+right: 15%;
+left: 15%;
+height: 12%;
+border-radius: 999px;
+background: #050505;
+box-shadow: 0 1px #d4d4d4;
+transform: rotate(-38deg);
+}
+.arcade-mock__screw--tl {
+top: clamp(.32rem, .8vw, .6rem);
+left: clamp(.32rem, .8vw, .6rem);
+}
+.arcade-mock__screw--tr {
+top: clamp(.32rem, .8vw, .6rem);
+right: clamp(.32rem, .8vw, .6rem);
+}
+.arcade-mock__screw--bl {
+bottom: clamp(.32rem, .8vw, .6rem);
+left: clamp(.32rem, .8vw, .6rem);
+}
+.arcade-mock__screw--br {
+right: clamp(.32rem, .8vw, .6rem);
+bottom: clamp(.32rem, .8vw, .6rem);
+}
+
+.arcade-mock__game-topline {
+display: flex;
+justify-content: space-between;
+align-items: start;
+font-size: clamp(1.05rem, 2.6vw, 1.8rem);
+line-height: 1;
+}
+.arcade-mock__game-topline > span {
+letter-spacing: -.08em;
+}
+.arcade-mock__game-topline strong {
+margin-top: -.85rem;
+margin-right: clamp(1.2rem, 2.2vw, 1.8rem);
+padding: .45rem .75rem;
+border: 3px solid #080808;
+border-radius: .25rem;
+background: #060606;
+color: #46f23e;
+font-size: clamp(.8rem, 1.8vw, 1.25rem);
+letter-spacing: .035em;
+text-shadow: 0 0 6px #46f23e;
+}
+
+.arcade-mock__viewport {
+position: relative;
+display: grid;
+place-items: center;
+align-content: center;
+gap: .2rem;
+margin: clamp(.45rem, 1.5vw, 1rem) clamp(.1rem, 2vw, 1.8rem);
+min-height: clamp(15rem, 30vw, 22rem);
+overflow: hidden;
+border: clamp(4px, .65vw, 8px) solid #090909;
+border-radius: .5rem;
+color: #fff;
+background: #070707;
+box-shadow: inset 0 0 0 3px #8d8d8d;
+}
+.arcade-mock__viewport::after {
+content: "";
+position: absolute;
+inset: 0;
+opacity: .22;
+pointer-events: none;
+background: repeating-linear-gradient(0deg, transparent 0 3px, #fff 3px 4px);
+}
+
+.arcade-mock__mystery {
+position: relative;
+z-index: 1;
+display: grid;
+width: clamp(4.8rem, 10vw, 6.8rem);
+aspect-ratio: .62;
+place-items: center;
+border: clamp(2px, .32vw, 4px) solid #d7d7d7;
+border-radius: 48% 48% 48% 48% / 30% 30% 30% 30%;
+background: radial-gradient(ellipse at 32% 25%, #adadad, #4d4d4d 48%, #171717 72%);
+box-shadow: inset .18rem .2rem .2rem #fff4, inset -.18rem -.24rem .3rem #000, 0 .35rem .2rem #0007;
+filter: drop-shadow(0 0 .35rem #fff6);
+}
+.arcade-mock__mystery::before {
+content: "";
+position: absolute;
+top: 10%;
+width: 14%;
+aspect-ratio: 1;
+border-radius: 50%;
+background: #111;
+box-shadow: inset 0 1px #aaa, 0 0 0 1px #e4e4e4;
+}
+.arcade-mock__mystery b {
+color: #f3f3f3;
+font-size: clamp(3rem, 8vw, 5rem);
+text-shadow: 3px 3px #111;
+}
+.arcade-mock__viewport p {
+position: relative;
+z-index: 1;
+margin: 0;
+font-size: clamp(1.55rem, 4vw, 2.8rem);
+letter-spacing: .025em;
+}
+.arcade-mock__viewport .arcade-mock__hint {
+margin-top: -.2rem;
+padding-inline: .8rem;
+color: #fff;
+font-family: Inter, "Hiragino Sans", sans-serif;
+font-size: clamp(.6rem, 1.35vw, .85rem);
+font-weight: 700;
+letter-spacing: 0;
+text-align: center;
+}
+
+.arcade-mock__start {
+justify-self: center;
+min-width: min(74%, 19rem);
+padding: .62rem 1rem .54rem;
+border: 4px solid #090909;
+border-radius: .6rem;
+background: #2faa66;
+color: #070707;
+cursor: pointer;
+font-family: inherit;
+font-size: clamp(1.35rem, 3.4vw, 2.2rem);
+letter-spacing: .05em;
+box-shadow: .25rem .25rem 0 #080808;
+}
+.arcade-mock__start i {
+margin-right: .45rem;
+font-style: normal;
+font-size: .75em;
+}
+.arcade-mock__start:active {
+transform: translate(.18rem, .18rem);
+box-shadow: .05rem .05rem 0 #080808;
+}
+
+.arcade-mock__prizes {
+overflow: hidden;
+display: grid;
+grid-template-rows: auto 1fr;
+background: #070707;
+color: #fff;
+}
+.arcade-mock__prizes h2 {
+margin: 0;
+padding: .6rem;
+border-bottom: 5px solid #fff;
+color: #fff;
+font-size: clamp(1.1rem, 2.4vw, 1.75rem);
+text-align: center;
+letter-spacing: .02em;
+}
+.arcade-mock__prizes ol {
+display: grid;
+margin: 0;
+padding: 0 .6rem;
+list-style: none;
+}
+.arcade-mock__prizes li {
+display: grid;
+grid-template-columns: 1fr minmax(3.4rem, .8fr) .5fr;
+align-items: center;
+gap: .45rem;
+padding: .65rem 0;
+border-bottom: 2px dashed #fff;
+}
+.arcade-mock__prizes li:last-child {
+border-bottom: 0;
+}
+.arcade-mock__prizes li strong {
+font-size: clamp(.78rem, 1.65vw, 1.1rem);
+line-height: .9;
+}
+.arcade-mock__prize-unknown {
+display: grid;
+aspect-ratio: 1;
+place-items: center;
+border: 2px solid #aaa;
+color: #fff;
+background: linear-gradient(135deg, #575757, #1b1b1b);
+font-size: clamp(1.6rem, 3vw, 2.5rem);
+}
+.arcade-mock__prizes li b {
+font-size: clamp(1rem, 2vw, 1.5rem);
+}
+.arcade-mock__caption {
+margin: 0;
+color: #333;
+font-size: clamp(.55rem, 1.2vw, .75rem);
+letter-spacing: .16em;
+text-align: center;
+}
+
+@media (max-width: 620px) {
+.arcade-mock {
+align-content: start;
+}
+.arcade-mock__console {
+grid-template-columns: 1fr;
+}
+.arcade-mock__game {
+min-height: 30rem;
+}
+.arcade-mock__prizes ol {
+grid-template-columns: repeat(3, 1fr);
+gap: .35rem;
+padding: .5rem;
+}
+.arcade-mock__prizes li {
+grid-template-columns: 1fr;
+justify-items: center;
+gap: .25rem;
+border: 0;
+text-align: center;
+}
+.arcade-mock__prizes li strong br {
+display: none;
+}
+.arcade-mock__prizes li b {
+display: none;
+}
+
+}
+
+.roulette-stage {
+position: relative;
+display: grid;
+place-items: center;
+margin: 1.5rem 0;
+width: 100%;
+aspect-ratio: 1 / 1;
+padding: 1rem;
+border-radius: 1.5rem;
+background: #eeeeee;
+}
+
+.roulette-stage__image {
+width: min(100%, 24rem);
+aspect-ratio: 1 / 1;
+object-fit: contain;
+/* Reserve space for the winner badge without covering the design's caption. */
+  padding-bottom: 5.5rem;
+}
+
+/* Animate the existing winner image so each draw always shows one keychain. */
+
+/* Live roulette screen: the finished arcade panel reuses the approved mock shell. */
+.arcade-live {
+display: flex;
+min-height: 0;
+height: 100svh;
+flex-direction: column;
+align-items: stretch;
+gap: clamp(.15rem, .5vw, .45rem);
+padding: clamp(.5rem, 1vw, 1rem);
+overflow: hidden;
+cursor: auto;
+}
+
+.arcade-live .arcade-mock__logo h1 {
+display: grid;
+width: 100vw;
+justify-items: center;
+position: fixed;
+top: clamp(.3rem, 1vw, .8rem);
+left: 50vw;
+z-index: 3;
+margin: 0;
+line-height: 0;
+pointer-events: none;
+transform: translateX(-50%);
+}
+
+/* The intro keeps the full-size title, while this fixed game header reserves a compact title bar. */
+.arcade-live .arcade-mock__logo h1 img {
+width: auto;
+height: min(9vw, 7.5rem);
+}
+
+.arcade-live .arcade-mock__logo {
+width: 100%;
+flex: 0 0 auto;
+height: min(13vw, 10rem);
+min-height: 0;
+margin-inline: 0;
+}
+
+.arcade-live .arcade-mock__console,
+.arcade-live .arcade-mock__caption {
+position: static;
+}
+
+.arcade-live .arcade-mock__console {
+width: min(100%, 72rem);
+height: min(74.4svh, 38rem);
+flex: 0 1 auto;
+min-height: 0;
+}
+
+.arcade-live .arcade-mock__caption {
+flex: 0 0 auto;
+}
+
+.arcade-live .arcade-mock__viewport {
+min-height: 0;
+grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.arcade-live[data-phase="ready"] .arcade-mock__viewport,
+.arcade-live[data-phase="idle"] .arcade-mock__viewport {
+grid-template-rows: auto auto auto;
+}
+
+.arcade-live .roulette-stage {
+width: auto;
+aspect-ratio: auto;
+margin: 0 clamp(.1rem, 2vw, 1.8rem);
+padding: 0;
+border-radius: .5rem;
+background: #070707;
+cursor: default;
+}
+
+.arcade-live .arcade-mock__game-topline {
+justify-content: flex-end;
+}
+
+.arcade-live .arcade-mock__game-topline strong {
+margin-right: clamp(.1rem, 2vw, 1.8rem);
+}
+
+.arcade-live
+
+.arcade-live
+
+.arcade-live
+.arcade-live
+.arcade-live
+.arcade-live
+.arcade-live
+.arcade-live
+.arcade-live
+.arcade-live
+
+.arcade-live .arcade-mock__game,
+.arcade-live .arcade-mock__prizes {
+min-height: 0;
+}
+
+.arcade-live__keychain-display {
+position: relative;
+z-index: 1;
+display: grid;
+width: auto;
+height: min(100%, 21rem);
+aspect-ratio: 1;
+place-items: center;
+overflow: hidden;
+border: 3px solid #d9d9d2;
+border-radius: .45rem;
+background: #f8f8f3;
+box-shadow: inset 0 0 0 3px #151515, 0 .3rem .5rem #0009;
+}
+
+.arcade-live .roulette-stage__image {
+position: relative;
+z-index: 1;
+width: min(84%, 16rem);
+height: 84%;
+aspect-ratio: auto;
+max-width: none;
+padding: 0;
+object-fit: contain;
+filter: none;
+}
+
+.arcade-live
+
+.arcade-live__loading {
+color: #fff;
+font-size: clamp(1.05rem, 3vw, 1.8rem) !important;
+letter-spacing: .08em;
+text-shadow: 0 0 .5rem #46f23e;
+}
+
+.arcade-live__controls {
+display: grid;
+align-items: center;
+justify-items: center;
+min-height: clamp(3.9rem, 8vw, 5.5rem);
+padding-top: .45rem;
+}
+
+.arcade-live__button {
+min-width: min(74%, 19rem);
+padding: .62rem 1rem .54rem;
+border: 4px solid #090909;
+border-radius: .6rem;
+color: #070707;
+cursor: pointer;
+font-family: inherit;
+font-size: clamp(1.2rem, 3vw, 2rem);
+letter-spacing: .05em;
+box-shadow: .25rem .25rem 0 #080808;
+}
+
+.arcade-live__button i {
+margin-right: .45rem;
+font-style: normal;
+font-size: .75em;
+}
+
+.arcade-live__button:active {
+transform: translate(.18rem, .18rem);
+box-shadow: .05rem .05rem 0 #080808;
+}
+
+.arcade-live__button--stop {
+background: #ff3434;
+color: #fff;
+text-shadow: 2px 2px #9d1010;
+}
+
+.arcade-live__button--retry {
+min-width: clamp(4rem, 7vw, 5rem);
+background: #ffcf28;
+}
+
+.arcade-live__button--next {
+background: #2faa66;
+}
+
+.arcade-live__result-actions {
+display: flex;
+width: min(88%, 25rem);
+gap: .75rem;
+justify-content: center;
+}
+
+.arcade-live__result-actions .arcade-live__button {
+flex: 1;
+font-size: clamp(1rem, 2.6vw, 1.55rem);
+}
+
+.arcade-live__result-actions .arcade-live__button--retry {
+display: grid;
+min-height: clamp(4rem, 7vw, 5rem);
+place-items: center;
+padding: 0;
+padding-inline: .35rem;
+font-size: clamp(2.2rem, 5vw, 3.2rem);
+line-height: 1;
+}
+
+.arcade-live__complete {
+position: relative;
+z-index: 1;
+display: grid;
+gap: .2rem;
+place-items: center;
+align-self: center;
+width: min(90%, 34rem);
+padding: clamp(.75rem, 2vw, 1.2rem);
+border: 4px solid #fff;
+border-radius: .45rem;
+background: #0a0a0a;
+color: #ffd62e;
+text-align: center;
+box-shadow: inset 0 0 0 3px #1e1e1e;
+}
+
+.arcade-live__complete p {
+margin: 0;
+color: #ffd62e;
+font-size: clamp(1.05rem, 3.2vw, 2.25rem);
+text-shadow: 2px 2px #7d5300;
+}
+
+.arcade-live__complete span {
+color: #fff;
+font-size: clamp(.55rem, 1.4vw, .9rem);
+letter-spacing: .08em;
+}
+
+.arcade-live__status {
+z-index: 3;
+margin: .35rem 0 -.25rem;
+color: #b41111;
+font-family: Inter, "Hiragino Sans", sans-serif;
+font-size: .75rem;
+font-weight: 700;
+text-align: center;
+}
+
+.arcade-live__result.is-winner {
+color: #ffdf2e;
+}
+
+.arcade-live__results-trigger {
+cursor: pointer;
+}
+
+.arcade-live__results-trigger:focus-visible {
+outline: 4px solid #46f23e;
+outline-offset: .3rem;
+}
+
+.arcade-live .arcade-mock__prizes li {
+grid-template-columns: 1fr minmax(3.4rem, .8fr);
+}
+
+.arcade-live__result-image {
+display: block;
+width: 100%;
+aspect-ratio: 1;
+max-height: none;
+padding: .2rem;
+border: 2px solid #e8e8df;
+border-radius: .2rem;
+background: #f8f8f3;
+object-fit: contain;
+overflow: hidden;
+justify-self: center;
+filter: drop-shadow(0 .2rem .15rem #0008);
+}
+
+@media (max-width: 620px) {
+.arcade-live .arcade-mock__viewport {
+min-height: 18rem;
+}
+
+  .arcade-live .arcade-mock__game {
+min-height: 0;
+}
+
+  .arcade-live .roulette-stage__image {
+width: min(52%, 11.5rem);
+height: min(60%, 10rem);
+}
+
+  .arcade-live__keychain-display {
+width: auto;
+height: min(88%, 16rem);
+}
+
+  .arcade-live__result-actions {
+width: 96%;
+gap: .45rem;
+}
+
+  .arcade-live__result-actions .arcade-live__button {
+padding-inline: .55rem;
+}
+
+}
+
+/* Projection palette and sizing overrides retained from the baseline. */
+.arcade-live .roulette-stage {
+color: #000;
+background: #c3c3c3;
+}
+
+.arcade-live .roulette-stage::after {
+display: none;
+}
+
+.arcade-live .arcade-mock__game-topline strong {
+background: #c3c3c3;
+color: #000;
+text-shadow: none;
+}
+
+.arcade-live .arcade-mock__viewport .arcade-mock__hint,
+.arcade-live__loading,
+.arcade-live__complete span {
+color: #000;
+text-shadow: none;
+}
+
+.arcade-live .arcade-mock__prizes {
+background: #c3c3c3;
+color: #000;
+}
+
+.arcade-live .arcade-mock__prizes h2 {
+border-bottom-color: #000;
+color: #000;
+}
+
+.arcade-live .arcade-mock__prizes li {
+border-bottom-color: #333;
+}
+
+.arcade-live .arcade-mock__prize-unknown {
+border-color: #333;
+color: #000;
+background: #fff;
+}
+
+.arcade-live__complete {
+border-color: #000;
+background: #c3c3c3;
+color: #ea5324;
+box-shadow: inset 0 0 0 3px #555;
+}
+
+.arcade-live__complete p,
+.arcade-live__result.is-winner {
+color: #ea5324;
+text-shadow: none;
+}
+
+.arcade-live__keychain-display {
+height: min(100%, 24rem);
+}
+
+.arcade-live .arcade-mock__logo {
+height: min(11.7vw, 9.2rem);
+}
+
+.arcade-live .roulette-stage__image {
+width: min(84%, 16rem);
+height: 84%;
+}
+
+.arcade-live .arcade-mock__prizes li {
+grid-template-columns: 1fr minmax(4.6rem, 1fr);
+}
+
+.arcade-live__result-surface {
+display: grid;
+width: 100%;
+aspect-ratio: 1;
+place-items: center;
+overflow: hidden;
+border: 2px solid #333;
+border-radius: .2rem;
+background: #fff;
+}
+
+.arcade-live__result-image {
+display: block;
+width: min(6vw, calc(100% - 1.4rem));
+height: min(6vw, calc(100% - 1.4rem));
+max-height: none;
+padding: 0;
+border: 0;
+border-radius: 0;
+background: transparent;
+object-fit: contain;
+filter: none;
+}
+
+@media (max-width: 620px) {
+.arcade-live__keychain-display {
+height: min(92%, 18rem);
+}
+
+  .arcade-live__result-image {
+width: min(15vw, calc(100% - 1rem));
+height: min(15vw, calc(100% - 1rem));
+}
+
+}

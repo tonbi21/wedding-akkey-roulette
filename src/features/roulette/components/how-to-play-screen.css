@@ -1,0 +1,369 @@
+/* How-to-play screen, prize panel, and responsive rules. */
+/* How-to-play interstitial shown before the live roulette. */
+.how-to-play {
+display: flex;
+min-height: 100svh;
+flex-direction: column;
+gap: clamp(.45rem, 1vw, .9rem);
+padding: clamp(.55rem, 1.1vw, 1.1rem);
+overflow: hidden;
+color: #080808;
+background: #fbfbf8;
+font-family: "Arial Black", Impact, "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+.how-to-play__logo {
+display: flex;
+flex: 0 0 auto;
+height: min(9vw, 7.5rem);
+align-items: center;
+justify-content: center;
+}
+
+.how-to-play__logo img {
+width: auto;
+height: min(9vw, 7.5rem);
+object-fit: contain;
+}
+
+.how-to-play__console {
+display: grid;
+width: min(100%, 78rem);
+height: min(74.4svh, 38rem);
+min-height: 0;
+flex: 0 1 auto;
+grid-template-columns: minmax(0, 1fr) minmax(13rem, .34fr);
+gap: clamp(.55rem, 1.2vw, 1rem);
+margin: 0 auto;
+}
+
+.how-to-play__rules-panel,
+.how-to-play__prizes {
+border: clamp(3px, .45vw, 6px) solid #090909;
+border-radius: .65rem;
+box-shadow: .3rem .3rem 0 #d7d7d2;
+}
+
+.how-to-play__rules-panel {
+position: relative;
+display: grid;
+min-height: 0;
+grid-template-rows: auto auto;
+align-content: center;
+gap: clamp(.45rem, .8vw, .65rem);
+padding: clamp(.7rem, 1.4vw, 1.2rem);
+background: #fff;
+}
+
+.how-to-play__screw {
+position: absolute;
+z-index: 2;
+width: clamp(.65rem, 1.4vw, .9rem);
+aspect-ratio: 1;
+border: 1px solid #111;
+border-radius: 50%;
+background: radial-gradient(circle at 35% 32%, #fff 0 14%, #9a9a9a 18% 43%, #282828 48% 72%, #030303 76%);
+box-shadow: inset -.06rem -.06rem 0 #000, .04rem .04rem 0 #d6d6d0;
+}
+
+.how-to-play__screw::after {
+content: "";
+position: absolute;
+top: 44%;
+right: 15%;
+left: 15%;
+height: 12%;
+border-radius: 999px;
+background: #050505;
+box-shadow: 0 1px #d4d4d4;
+transform: rotate(-38deg);
+}
+
+.how-to-play__screw--tl {
+top: clamp(.32rem, .8vw, .6rem);
+left: clamp(.32rem, .8vw, .6rem);
+}
+
+.how-to-play__screw--tr {
+top: clamp(.32rem, .8vw, .6rem);
+right: clamp(.32rem, .8vw, .6rem);
+}
+
+.how-to-play__screw--bl {
+bottom: clamp(.32rem, .8vw, .6rem);
+left: clamp(.32rem, .8vw, .6rem);
+}
+
+.how-to-play__screw--br {
+right: clamp(.32rem, .8vw, .6rem);
+bottom: clamp(.32rem, .8vw, .6rem);
+}
+
+.how-to-play__screen {
+position: relative;
+display: grid;
+min-height: 27.75rem;
+align-content: center;
+padding: clamp(.55rem, 1vw, .85rem) clamp(1.2rem, 2.4vw, 2rem);
+overflow: hidden;
+border: clamp(4px, .65vw, 8px) solid #090909;
+border-radius: .5rem;
+color: #fff;
+background: #070707;
+box-shadow: inset 0 0 0 3px #8d8d8d;
+}
+
+.how-to-play__screen::after {
+content: "";
+position: absolute;
+inset: 0;
+opacity: .2;
+pointer-events: none;
+background: repeating-linear-gradient(0deg, transparent 0 3px, #fff 3px 4px);
+}
+
+.how-to-play__screen h1,
+.how-to-play__subtitle,
+.how-to-play__screen ol {
+position: relative;
+z-index: 1;
+}
+
+.how-to-play__screen h1 {
+margin: 0;
+color: #ffed23;
+font-size: clamp(1.45rem, 2.7vw, 2.5rem);
+letter-spacing: .09em;
+text-align: center;
+text-shadow: 3px 3px #151515;
+}
+
+.how-to-play__subtitle {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: clamp(.7rem, 2vw, 1.8rem);
+margin: .05rem 0 clamp(.35rem, .8vw, .6rem);
+font-size: clamp(.72rem, 1.35vw, 1rem);
+text-align: center;
+}
+
+.how-to-play__subtitle::before,
+.how-to-play__subtitle::after {
+display: none;
+}
+
+.how-to-play__screen ol,
+.how-to-play__prizes ol {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+
+.how-to-play__screen li {
+display: grid;
+grid-template-columns: clamp(1.9rem, 3.6vw, 2.7rem) 1fr;
+align-items: center;
+gap: clamp(.5rem, 1vw, .8rem);
+min-height: clamp(2.7rem, 4vw, 3.375rem);
+border-bottom: 2px dashed #ddd;
+}
+
+.how-to-play__screen li > span {
+display: grid;
+aspect-ratio: 1;
+place-items: center;
+border: 2px solid #0d520e;
+border-radius: .2rem;
+color: #0a160a;
+background: #2faa66;
+font-size: clamp(1rem, 2vw, 1.55rem);
+box-shadow: inset .12rem .12rem #a4ffa0, .12rem .12rem 0 #0b6e10;
+}
+
+.how-to-play__screen li p {
+margin: 0;
+font-size: clamp(1rem, 2.1vw, 1.65rem);
+line-height: 1.15;
+}
+
+.how-to-play__screen li strong {
+color: #ffed23;
+}
+
+.how-to-play__start {
+justify-self: center;
+min-width: min(74%, 27rem);
+padding: .62rem 1rem .54rem;
+border: 4px solid #090909;
+border-radius: .6rem;
+background: #2faa66;
+color: #070707;
+cursor: pointer;
+font-family: inherit;
+font-size: clamp(1.1rem, 2.7vw, 2rem);
+letter-spacing: .05em;
+box-shadow: .25rem .25rem 0 #080808;
+}
+
+.how-to-play__start i {
+margin-right: .45rem;
+font-style: normal;
+font-size: .75em;
+}
+
+.how-to-play__start:active {
+transform: translate(.18rem, .18rem);
+box-shadow: .05rem .05rem 0 #080808;
+}
+
+.how-to-play__prizes {
+min-height: 0;
+padding: clamp(.55rem, 1.2vw, .9rem);
+overflow: hidden;
+color: #fff;
+background: #070707;
+}
+
+.how-to-play__prizes h2 {
+margin: 0;
+color: #ffed23;
+font-size: clamp(1.6rem, 3.4vw, 2.7rem);
+letter-spacing: .1em;
+text-align: center;
+}
+
+.how-to-play__prizes > p {
+margin: -.25rem 0 .55rem;
+color: #fff;
+font-size: clamp(.68rem, 1.4vw, .95rem);
+text-align: center;
+}
+
+.how-to-play__prizes li {
+padding: clamp(.45rem, 1vw, .75rem) 0;
+border-top: 2px dashed #ddd;
+}
+
+.how-to-play__prizes li > div {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: .5rem;
+}
+
+.how-to-play__prizes strong {
+padding: .12rem .5rem;
+border: 2px solid #fff;
+border-radius: .28rem;
+font-size: clamp(.7rem, 1.35vw, .95rem);
+}
+
+.how-to-play__prizes b {
+color: #ffed23;
+font-size: clamp(1rem, 2vw, 1.45rem);
+letter-spacing: .08em;
+}
+
+.how-to-play__prizes li > span {
+display: grid;
+width: min(82%, 10rem);
+aspect-ratio: 1.65;
+place-items: center;
+margin: .35rem auto 0;
+border: 3px solid #fff;
+color: #fff;
+background: radial-gradient(circle at 35% 30%, #707070, #262626 54%, #080808 100%);
+font-size: clamp(2.4rem, 5vw, 4.4rem);
+text-shadow: 3px 3px #000;
+}
+
+@media (max-width: 620px) {
+.how-to-play {
+height: auto;
+overflow: auto;
+}
+
+  .how-to-play__logo {
+height: min(22vw, 8rem);
+}
+
+  .how-to-play__console {
+grid-template-columns: 1fr;
+}
+
+  .how-to-play__rules-panel {
+min-height: 40rem;
+}
+
+  .how-to-play__prizes {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: .45rem;
+}
+
+  .how-to-play__prizes h2, .how-to-play__prizes > p {
+grid-column: 1 / -1;
+}
+
+  .how-to-play__prizes li {
+padding: .35rem 0;
+border-top: 0;
+}
+
+  .how-to-play__prizes li > div {
+display: grid;
+justify-items: center;
+}
+
+  .how-to-play__prizes li > span {
+width: 100%;
+aspect-ratio: 1;
+font-size: clamp(1.8rem, 8vw, 3rem);
+}
+
+}
+
+/* Projection palette overrides retained from the baseline. */
+.how-to-play__screen,
+.how-to-play__prizes {
+color: #000;
+background: #c3c3c3;
+}
+
+.how-to-play__screen::after {
+display: none;
+}
+
+.how-to-play__subtitle,
+.how-to-play__prizes > p {
+color: #000;
+text-shadow: none;
+}
+
+.how-to-play__screen h1,
+.how-to-play__screen li strong,
+.how-to-play__prizes h2,
+.how-to-play__prizes b {
+color: #ea5324;
+text-shadow: none;
+}
+
+.how-to-play__screen li {
+border-bottom-color: #333;
+}
+
+.how-to-play__prizes li {
+border-top-color: #333;
+}
+
+.how-to-play__prizes strong {
+border-color: #000;
+}
+
+.how-to-play__prizes li > span {
+border-color: #000;
+color: #000;
+background: #f8f8f3;
+text-shadow: none;
+}
