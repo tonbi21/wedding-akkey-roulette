@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { initialGameState } from "../state/gameReducer";
@@ -15,6 +15,28 @@ describe("RouletteScreen", () => {
     winnerIds: ["keychain-01", "keychain-02", "keychain-03"]
   });
   const readyAssets = { ready: true, progress: 100, failedAssets: [] };
+
+  it("shows color-coded winner rounds with their prize images in the history dialog", () => {
+    render(<RouletteScreen
+      assetState={readyAssets}
+      initialState={state({
+        phase: "complete",
+        round: 3,
+        winnerIds: ["keychain-01", "keychain-25", "keychain-48"]
+      })}
+    />);
+
+    fireEvent.click(screen.getByRole("button", { name: "当選者を表示" }));
+
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "RESULTS" })).toBeInTheDocument();
+    expect(within(dialog).queryAllByText("PRIZE", { exact: true })).toHaveLength(0);
+    expect(within(dialog).getByRole("img", { name: "高級チョコの景品" })).toHaveAttribute("src", "/media/prize-1.png");
+    expect(within(dialog).getByRole("img", { name: "季節のフルーツの景品" })).toHaveAttribute("src", "/media/prize-2.png");
+    expect(within(dialog).getByRole("img", { name: "神戸牛食べ比べセットの景品" })).toHaveAttribute("src", "/media/prize-3.png");
+    expect(dialog.querySelectorAll(".history-dialog__round--green")).toHaveLength(1);
+    expect(dialog.querySelectorAll(".history-dialog__round--orange")).toHaveLength(2);
+  });
 
   it.each([1, 2, 3] as const)("RETRY reruns round %i, saves only earlier winners and makes the cancelled image eligible", (round) => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
@@ -107,9 +129,9 @@ describe("RouletteScreen", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("uses a random selection across all 37 designs on STOP and excludes previous winners", () => {
+  it("uses a random selection across all 36 designs on STOP and excludes previous winners", () => {
     const random = vi.spyOn(globalThis.crypto, "getRandomValues").mockImplementation((array) => {
-      (array as Uint32Array)[0] = 36;
+      (array as Uint32Array)[0] = 35;
       return array;
     });
     const audioController: AudioController = {
@@ -127,7 +149,7 @@ describe("RouletteScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "NEXT" }));
     fireEvent.click(screen.getByRole("button", { name: "START" }));
     random.mockImplementation((array) => {
-      (array as Uint32Array)[0] = 35;
+      (array as Uint32Array)[0] = 34;
       return array;
     });
     fireEvent.click(screen.getByRole("button", { name: "STOP" }));
@@ -211,7 +233,7 @@ describe("RouletteScreen", () => {
     expect(screen.getByRole("dialog")).toHaveAccessibleName("当選者");
     expect(screen.queryByText("History")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog")).toHaveClass("history-dialog--expanded");
-    expect(screen.getByRole("img", { name: "1回目の当選画像" })).toHaveClass("history-dialog__image--inset");
+    expect(screen.getByRole("img", { name: "1回目の当選画像" }).parentElement).toHaveClass("history-dialog__keychain");
     expect(screen.getByRole("button", { name: "当選者を閉じる" })).toHaveClass("history-dialog__close");
     expect(screen.getByTestId("history-close-icon")).toBeInTheDocument();
     expect(screen.queryByText("×")).not.toBeInTheDocument();

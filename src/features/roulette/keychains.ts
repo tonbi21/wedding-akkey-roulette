@@ -14,6 +14,7 @@ const EXCLUDED_KEYCHAIN_IDS = new Set([
   "keychain-30",
   "keychain-32",
   "keychain-38",
+  "keychain-45",
   "keychain-46"
 ]);
 

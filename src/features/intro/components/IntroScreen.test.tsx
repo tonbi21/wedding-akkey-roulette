@@ -12,6 +12,7 @@ describe("IntroScreen", () => {
   it("keeps the completed hero video visible behind the supplied start image", () => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
     render(<IntroScreen />);
+    expect(screen.getByTestId("intro-title")).toHaveAttribute("src", "/media/akkey-roulette-title.png");
     fireEvent.click(screen.getByRole("button", { name: "TAP TO START" }));
     const video = screen.getByTestId("hero-video");
     expect(screen.queryByRole("button", { name: "GAME START" })).not.toBeInTheDocument();
@@ -19,6 +20,7 @@ describe("IntroScreen", () => {
     const start = screen.getByRole("button", { name: "GAME START" });
     expect(screen.getByTestId("hero-video")).toBeInTheDocument();
     expect(start.querySelector("img")).toHaveAttribute("src", "/media/game-start.png");
+    expect(screen.getByTestId("intro-title")).toBeInTheDocument();
   });
 
   it("starts the hero video and BGM together after TAP TO START", () => {

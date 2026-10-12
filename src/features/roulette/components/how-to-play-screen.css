@@ -4,6 +4,7 @@
 display: flex;
 min-height: 100svh;
 flex-direction: column;
+justify-content: center;
 gap: clamp(.45rem, 1vw, .9rem);
 padding: clamp(.55rem, 1.1vw, 1.1rem);
 overflow: hidden;
@@ -180,7 +181,7 @@ box-shadow: inset .12rem .12rem #a4ffa0, .12rem .12rem 0 #0b6e10;
 
 .how-to-play__screen li p {
 margin: 0;
-font-size: clamp(1rem, 2.1vw, 1.65rem);
+font-size: 24px;
 line-height: 1.15;
 }
 
@@ -224,7 +225,7 @@ background: #c3c3c3;
 
 .how-to-play__prizes h2 {
 margin: 0;
-color: #ea5324;
+color: #000;
 font-size: clamp(1.6rem, 3.4vw, 2.7rem);
 letter-spacing: .1em;
 text-align: center;
@@ -239,15 +240,20 @@ text-shadow: none;
 }
 
 .how-to-play__prizes li {
+display: grid;
+grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+align-items: center;
+gap: clamp(.5rem, 1vw, .75rem);
 padding: clamp(.45rem, 1vw, .75rem) 0;
 border-top: 2px dashed #333;
 }
 
-.how-to-play__prizes li > div {
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: .5rem;
+.how-to-play__prize-info {
+display: grid;
+align-content: center;
+justify-items: start;
+gap: .45rem;
+min-width: 0;
 }
 
 .how-to-play__prizes strong {
@@ -257,19 +263,21 @@ border-radius: .28rem;
 font-size: clamp(.7rem, 1.35vw, .95rem);
 }
 
-.how-to-play__prizes b {
-color: #ea5324;
+.how-to-play__prize-name {
+min-width: 0;
+color: #000;
 font-size: clamp(1rem, 2vw, 1.45rem);
-letter-spacing: .08em;
+letter-spacing: .02em;
+overflow-wrap: anywhere;
 }
 
-.how-to-play__prizes li > span {
+.how-to-play__prize-image {
 display: grid;
-width: min(82%, 10rem);
-aspect-ratio: 1.65;
+width: 100%;
+aspect-ratio: 1;
 place-items: center;
-margin: .35rem auto 0;
 border: 3px solid #000;
+object-fit: cover;
 color: #000;
 background: #f8f8f3;
 font-size: clamp(2.4rem, 5vw, 4.4rem);
@@ -305,18 +313,12 @@ grid-column: 1 / -1;
 }
 
   .how-to-play__prizes li {
+grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
 padding: .35rem 0;
 border-top: 0;
 }
 
-  .how-to-play__prizes li > div {
-display: grid;
-justify-items: center;
-}
-
-  .how-to-play__prizes li > span {
-width: 100%;
-aspect-ratio: 1;
+  .how-to-play__prize-image {
 font-size: clamp(1.8rem, 8vw, 3rem);
 }
 

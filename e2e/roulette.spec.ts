@@ -36,22 +36,45 @@ test.beforeEach(async ({ page }) => {
   await expect(page).toHaveURL(/\/roulette\/play$/);
   await expect(page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" })).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole("button", { name: "START" })).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByText("PLAY COUNT 1 / 3", { exact: true })).toBeVisible();
-  await expect(page.locator(".roulette-stage")).toHaveCSS("background-color", "rgb(7, 7, 7)");
+  await expect(page.getByText(/PLAY COUNT/, { exact: false })).toHaveCount(0);
+  await expect(page.locator(".roulette-stage")).toHaveCSS("background-color", "rgb(195, 195, 195)");
   await expect(page.getByText("›››")).toHaveCount(0);
   const titleBounds = await page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" }).boundingBox();
   const consoleBounds = await page.locator(".arcade-mock__console").boundingBox();
   expect(titleBounds).not.toBeNull();
   expect(consoleBounds).not.toBeNull();
   expect(titleBounds!.x + titleBounds!.width / 2).toBeCloseTo(consoleBounds!.x + consoleBounds!.width / 2, 0);
-  expect(consoleBounds!.y - (titleBounds!.y + titleBounds!.height)).toBeGreaterThan(28);
-  const playCountBounds = await page.getByText("PLAY COUNT 1 / 3", { exact: true }).boundingBox();
-  const stageBounds = await page.locator(".roulette-stage").boundingBox();
-  expect(playCountBounds).not.toBeNull();
-  expect(stageBounds).not.toBeNull();
-  expect(playCountBounds!.x + playCountBounds!.width).toBeCloseTo(stageBounds!.x + stageBounds!.width, 0);
+  expect(consoleBounds!.y - (titleBounds!.y + titleBounds!.height)).toBeGreaterThanOrEqual(10);
+  expect(titleBounds!.height).toBeGreaterThanOrEqual(115);
+  expect(consoleBounds!.width).toBeLessThanOrEqual(1160);
+  expect(consoleBounds!.y).toBeGreaterThanOrEqual(150);
+  expect(720 - (consoleBounds!.y + consoleBounds!.height)).toBeGreaterThanOrEqual(15);
+  const contentTop = titleBounds!.y;
+  const contentBottom = consoleBounds!.y + consoleBounds!.height;
+  expect(Math.abs(contentTop - (720 - contentBottom))).toBeLessThanOrEqual(8);
+  expect(titleBounds!.height).toBeCloseTo(115.2, 0);
+  expect(titleBounds!.width).toBeCloseTo(664, 0);
+  expect(consoleBounds!.height).toBeCloseTo(535.68, 0);
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
   await expect(page.locator(".ballpit")).toHaveCount(0);
+});
+
+test("suppresses inherited scanlines on the live roulette stage", async ({ page }) => {
+  expect(await page.locator(".roulette-stage").evaluate(
+    (stage) => getComputedStyle(stage, "::after").display
+  )).toBe("none");
+});
+
+test("aligns the play header image with the how-to-play header image", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  const playTitle = await page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" }).boundingBox();
+
+  await page.goto("/roulette");
+  const howToPlayTitle = await page.getByRole("img", { name: "WEDDING AKKEY-ROULETTE" }).boundingBox();
+
+  expect(playTitle).not.toBeNull();
+  expect(howToPlayTitle).not.toBeNull();
+  expect(playTitle!.y).toBeCloseTo(howToPlayTitle!.y, 0);
 });
 
 test("keeps the READY prompt close to its keychain silhouette", async ({ page }) => {
@@ -102,8 +125,24 @@ test("completes three rounds and preserves a three-image history", async ({ page
   await expect(page.locator("main")).toHaveAttribute("data-phase", "complete");
   await expect(page.getByRole("button", { name: "START" })).toHaveCount(0);
   await page.getByRole("button", { name: "当選者を表示", exact: true }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("dialog").getByRole("img")).toHaveCount(3);
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("img")).toHaveCount(3);
+  await expect(dialog.getByText("PRIZE", { exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole("heading", { name: "RESULTS" })).toHaveCSS("color", "rgb(0, 0, 0)");
+  await expect(dialog.getByRole("heading", { name: "RESULTS" })).toHaveCSS("font-size", "32px");
+  await expect(dialog.getByRole("img", { name: "高級チョコの景品" })).toHaveAttribute("src", "/media/prize-1.png");
+  await expect(dialog.getByRole("img", { name: "季節のフルーツの景品" })).toHaveAttribute("src", "/media/prize-2.png");
+  await expect(dialog.getByRole("img", { name: "神戸牛食べ比べセットの景品" })).toHaveAttribute("src", "/media/prize-3.png");
+  expect(await dialog.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
+  const keychainBounds = await dialog.locator(".history-dialog__keychain").first().boundingBox();
+  const prizeBounds = await dialog.locator(".history-dialog__prize-placeholder").first().boundingBox();
+  expect(keychainBounds).not.toBeNull();
+  expect(prizeBounds).not.toBeNull();
+  expect(keychainBounds!.width).toBeGreaterThan(144);
+  expect(prizeBounds!.width).toBeGreaterThan(144);
+  expect(keychainBounds!.width).toBeLessThanOrEqual(168);
+  expect(prizeBounds!.width).toBeLessThanOrEqual(168);
 });
 
 test("double START does not create a second countdown", async ({ page }) => {
@@ -222,24 +261,33 @@ test("all 48 final PNGs decode and the draw only uses final images", async ({ pa
   await expect(page.getByRole("dialog").getByRole("img")).toHaveAttribute("src", await image.getAttribute("src") as string);
 });
 
-test("keeps keychain surfaces square and uses frame-aligned corners", async ({ page }) => {
+test("keeps keychain surfaces square with expanded white backgrounds", async ({ page }) => {
   const app = page.locator("main");
   await page.getByRole("button", { name: "START" }).click();
   await page.getByRole("button", { name: "STOP" }).click();
 
   const keychainSurface = await page.locator(".arcade-live__keychain-display").boundingBox();
-  const resultSurface = await page.locator(".arcade-live__result-image").first().boundingBox();
+  const keychainImage = await page.getByRole("img", { name: "Current roulette image" }).boundingBox();
+  const resultSurface = await page.locator(".arcade-live__result-surface").first().boundingBox();
+  const resultImage = await page.locator(".arcade-live__result-image").first().boundingBox();
   const unknownSurface = await page.locator(".arcade-mock__prize-unknown").first().boundingBox();
   expect(keychainSurface).not.toBeNull();
+  expect(keychainImage).not.toBeNull();
   expect(resultSurface).not.toBeNull();
+  expect(resultImage).not.toBeNull();
   expect(unknownSurface).not.toBeNull();
   expect(keychainSurface!.width).toBeCloseTo(keychainSurface!.height, 0);
   expect(keychainSurface!.width).toBeGreaterThan(310);
+  expect(keychainImage!.width).toBeGreaterThanOrEqual(250);
+  expect(keychainSurface!.width - keychainImage!.width).toBeGreaterThanOrEqual(70);
   expect(resultSurface!.width).toBeCloseTo(resultSurface!.height, 0);
   expect(resultSurface!.width).toBeCloseTo(unknownSurface!.width, 0);
+  expect(resultSurface!.width - resultImage!.width).toBeGreaterThanOrEqual(18);
   await expect(page.getByText("---", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("img", { name: "Current roulette image" })).toHaveCSS("filter", "none");
-  await expect(page.locator(".arcade-mock__corner")).toHaveText(["", "", "", ""]);
+  await expect(page.locator(".arcade-mock__corner")).toHaveCount(0);
+  await expect(page.locator(".arcade-live__result-surface").first()).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator(".arcade-live__result-surface").first()).toHaveCSS("border-color", "rgb(51, 51, 51)");
   const retryStyles = await app.getByRole("button", { name: "RETRY" }).evaluate((button) => ({
     alignItems: getComputedStyle(button).alignItems,
     display: getComputedStyle(button).display,

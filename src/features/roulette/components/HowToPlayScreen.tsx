@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { PRIZES } from "../prizes";
 
 const rules = [
   <>結婚式の受付時に回していただいた<strong>アクキー</strong>をご確認ください。</>,
-  <>画面上で<strong>ルーレット</strong>を回します。</>,
-  <>ルーレットで<strong>当たりのアクキー</strong>が表示されます。</>,
+  <>画面上でルーレットを回し、<strong>当たりのアクキー</strong>が表示されます。</>,
   <>お手元のアクキーと<strong>同じ絵柄が出たら当たり</strong>です。</>,
   <>当たった方には<strong>景品</strong>があります。</>,
   <>当選者は<strong>3名</strong>です。</>
@@ -28,10 +28,6 @@ export function HowToPlayScreen() {
           <span aria-hidden="true" className="how-to-play__screw how-to-play__screw--br" />
 
           <div className="how-to-play__screen">
-            <span aria-hidden="true" className="how-to-play__corner how-to-play__corner--tl" />
-            <span aria-hidden="true" className="how-to-play__corner how-to-play__corner--tr" />
-            <span aria-hidden="true" className="how-to-play__corner how-to-play__corner--bl" />
-            <span aria-hidden="true" className="how-to-play__corner how-to-play__corner--br" />
             <h1>HOW TO PLAY</h1>
             <p className="how-to-play__subtitle">— 遊び方 —</p>
             <ol>
@@ -53,10 +49,13 @@ export function HowToPlayScreen() {
           <h2 id="prize-title">PRIZE</h2>
           <p>— 景品 —</p>
           <ol>
-            {["1人目", "2人目", "3人目"].map((label) => (
-              <li key={label}>
-                <div><strong>{label}</strong><b>???</b></div>
-                <span aria-label={`${label}の景品は後日公開`}>?</span>
+            {PRIZES.map((prize) => (
+              <li key={prize.round}>
+                <div className="how-to-play__prize-info">
+                  <strong>{prize.round}人目</strong>
+                  <b className="how-to-play__prize-name">{prize.name}</b>
+                </div>
+                <img alt={`${prize.name}の景品`} className="how-to-play__prize-image" src={prize.imageSrc} />
               </li>
             ))}
           </ol>

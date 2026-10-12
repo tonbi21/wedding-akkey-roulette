@@ -315,8 +315,9 @@ display: flex;
 min-height: 0;
 height: 100svh;
 flex-direction: column;
+justify-content: center;
 align-items: stretch;
-gap: clamp(.15rem, .5vw, .45rem);
+gap: clamp(.45rem, 1vw, .9rem);
 padding: clamp(.5rem, 1vw, 1rem);
 overflow: hidden;
 cursor: auto;
@@ -324,19 +325,14 @@ cursor: auto;
 
 .arcade-live .arcade-mock__logo h1 {
 display: grid;
-width: 100vw;
-justify-items: center;
-position: fixed;
-top: clamp(.3rem, 1vw, .8rem);
-left: 50vw;
-z-index: 3;
+width: 100%;
+place-items: center;
 margin: 0;
 line-height: 0;
 pointer-events: none;
-transform: translateX(-50%);
 }
 
-/* The intro keeps the full-size title, while this fixed game header reserves a compact title bar. */
+/* Match the how-to-play header height so both routes share the same centered title position. */
 .arcade-live .arcade-mock__logo h1 img {
 width: auto;
 height: min(9vw, 7.5rem);
@@ -345,7 +341,7 @@ height: min(9vw, 7.5rem);
 .arcade-live .arcade-mock__logo {
 width: 100%;
 flex: 0 0 auto;
-height: min(11.7vw, 9.2rem);
+height: min(9vw, 7.5rem);
 min-height: 0;
 margin-inline: 0;
 }
@@ -557,8 +553,12 @@ text-align: center;
 }
 
 .arcade-live__result.is-winner {
-color: #ea5324;
+color: #000;
 text-shadow: none;
+}
+
+.arcade-live .arcade-mock__game {
+grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .arcade-live__results-trigger {

@@ -20,6 +20,10 @@ describe("preloadAssets", () => {
     expect(AUDIO_ASSETS.roulette).toBe("/audio/percussion_drumroll_90s.mp3?v6");
   });
 
+  it("uses the half-second-trimmed winner cue with a refreshed cache key", () => {
+    expect(AUDIO_ASSETS.winner).toBe("/audio/winner.mp3?v16");
+  });
+
   it("reports progress after each asset settles", async () => {
     const progress: number[] = [];
     await preloadAssets(["image-a"], ["audio-a"], factory(), factory(), (state) => {

@@ -38,9 +38,10 @@ export function IntroScreen() {
     <main className="intro-screen" data-stage={showStart ? "start" : hasStarted ? "video" : "tap"}>
       {!videoFailed && (
         <video ref={videoRef} data-testid="hero-video" className="intro-screen__video" muted playsInline preload="auto" onEnded={finishIntro} onError={() => { setVideoFailed(true); finishIntro(); }}>
-          <source src="/media/akkey-roulette-hero-web.mp4" type="video/mp4" />
+          <source src="/media/akkey-roulette-hero-web-h264.mp4" type="video/mp4" />
         </video>
       )}
+      <img alt="WEDDING AKKEY-ROULETTE" className="intro-screen__title" data-testid="intro-title" src="/media/akkey-roulette-title.png" />
       <audio ref={audioRef} data-testid="intro-audio" preload="auto" src="/audio/wedding_akkey_roulette_retro_game_10s.mp3" />
       {!hasStarted && !showStart && (
         <button type="button" className="intro-screen__tap" aria-label="TAP TO START" onClick={beginIntro}>

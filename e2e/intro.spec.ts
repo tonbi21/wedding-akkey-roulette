@@ -60,8 +60,8 @@ test("replays an online-warmed roulette route offline", async ({ page }) => {
   });
   await expect.poll(() => page.evaluate(async () => {
     const cachesForApp = await caches.keys();
-    const cache = await caches.open(cachesForApp.find((name) => name === "wedding-akkey-roulette-v13")!);
-    const matches = await Promise.all(["/", "/roulette", "/roulette/play", "/media/akkey-roulette-hero-web.mp4", "/media/tap-to-start.png", "/media/game-start.png", "/audio/wedding_akkey_roulette_retro_game_10s.mp3"].map((path) => cache.match(path)));
+    const cache = await caches.open(cachesForApp.find((name) => name === "wedding-akkey-roulette-v14")!);
+    const matches = await Promise.all(["/", "/roulette", "/roulette/play", "/media/akkey-roulette-hero-web-h264.mp4", "/media/tap-to-start.png", "/media/game-start.png", "/audio/wedding_akkey_roulette_retro_game_10s.mp3"].map((path) => cache.match(path)));
     return matches.every(Boolean);
   })).toBe(true);
   await page.goto("/roulette/play");

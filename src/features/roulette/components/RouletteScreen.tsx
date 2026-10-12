@@ -202,16 +202,7 @@ export function RouletteScreen({
           <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--bl" />
           <span aria-hidden="true" className="arcade-mock__screw arcade-mock__screw--br" />
 
-          <div className="arcade-mock__game-topline">
-            <strong>PLAY COUNT {state.round} / 3</strong>
-          </div>
-
           <div className="arcade-mock__viewport roulette-stage">
-            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--tl" />
-            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--tr" />
-            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--bl" />
-            <span aria-hidden="true" className="arcade-mock__corner arcade-mock__corner--br" />
-
             {state.phase === "boot" ? <p className="arcade-live__loading">NOW LOADING...</p> : null}
             {state.phase === "error" ? <p className="arcade-live__loading" role="alert">LOADING ERROR</p> : null}
             {state.phase === "ready" || state.phase === "idle" ? (
@@ -274,14 +265,18 @@ export function RouletteScreen({
           role="button"
           tabIndex={0}
         >
-          <h2>MATCH RESULTS</h2>
+          <h2>RESULTS</h2>
           <ol>
             {[1, 2, 3].map((round) => {
               const winner = historyKeychains[round - 1];
               return (
                 <li className={winner ? "arcade-live__result is-winner" : "arcade-live__result"} key={round}>
                   <strong>ROUND<br />0{round}</strong>
-                  {winner ? <RouletteImage alt={`Round ${round} result`} className="arcade-live__result-image" keychain={winner} /> : <span className="arcade-mock__prize-unknown">?</span>}
+                  {winner ? (
+                    <span className="arcade-live__result-surface">
+                      <RouletteImage alt={`Round ${round} result`} className="arcade-live__result-image" keychain={winner} />
+                    </span>
+                  ) : <span className="arcade-mock__prize-unknown">?</span>}
                 </li>
               );
             })}

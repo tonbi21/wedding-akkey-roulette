@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { Keychain } from "../gameTypes";
+import { PRIZES } from "../prizes";
 import { RouletteImage } from "./RouletteImage";
 
 type HistoryDialogProps = {
@@ -8,6 +9,11 @@ type HistoryDialogProps = {
   onOpen: () => void;
   onClose: () => void;
   hideTrigger?: boolean;
+};
+
+const getWinnerTone = (winner: Keychain): "green" | "orange" => {
+  const keychainNumber = Number.parseInt(winner.id.replace("keychain-", ""), 10);
+  return keychainNumber <= 24 ? "green" : "orange";
 };
 
 export function HistoryDialog({ winners, open, onOpen, onClose, hideTrigger = false }: HistoryDialogProps) {
@@ -38,7 +44,7 @@ export function HistoryDialog({ winners, open, onOpen, onClose, hideTrigger = fa
             role="dialog"
           >
             <div className="history-dialog__heading">
-              <h2 className="history-dialog__title">当選者</h2>
+              <h2 className="history-dialog__title">RESULTS</h2>
               <button aria-label="当選者を閉じる" className="history-dialog__close" onClick={onClose} type="button">
                 <svg
                   aria-hidden="true"
@@ -52,16 +58,25 @@ export function HistoryDialog({ winners, open, onOpen, onClose, hideTrigger = fa
               </button>
             </div>
             <div className="history-dialog__grid">
-              {winners.map((winner, index) => (
-                <div className="history-dialog__item" key={winner.id}>
-                  <p>{index + 1}回目</p>
-                  <RouletteImage
-                    alt={`${index + 1}回目の当選画像`}
-                    className="history-dialog__image history-dialog__image--inset"
-                    keychain={winner}
-                  />
-                </div>
-              ))}
+              {winners.map((winner, index) => {
+                const prize = PRIZES[index];
+
+                return (
+                  <div className="history-dialog__item" key={winner.id}>
+                    <p className={`history-dialog__round history-dialog__round--${getWinnerTone(winner)}`}>
+                      ROUND {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <div className="history-dialog__keychain">
+                      <RouletteImage
+                        alt={`${index + 1}回目の当選画像`}
+                        className="history-dialog__image"
+                        keychain={winner}
+                      />
+                    </div>
+                    <img alt={`${prize.name}の景品`} className="history-dialog__prize-placeholder" src={prize.imageSrc} />
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
