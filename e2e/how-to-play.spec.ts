@@ -84,6 +84,7 @@ test("lays out each prize as black text beside a square image area", async ({ pa
     await expect(info).toBeVisible();
     await expect(name).toHaveText(expectedPrizes[index]);
     await expect(name).toHaveCSS("color", "rgb(0, 0, 0)");
+    await expect(name).toHaveCSS("font-size", "17.6px");
     await expect(image).toHaveAttribute("src", `/media/prize-${index + 1}.png`);
     await expect(image).toHaveAccessibleName(`${expectedPrizes[index]}の景品`);
 
