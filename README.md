@@ -1,105 +1,89 @@
-# wedding-akkey-roulette
+# Wedding Akkey Roulette
 
-## Local setup
+結婚式の余興で使用する、アクリルキーホルダー（アクキー）を使った抽選PWAです。受付時に配布したアクキーの絵柄を対象にルーレットを行い、3名の当選者を決めます。
 
-This is a Next.js PWA for a wedding lucky draw. Use Node.js 20.9 or newer for Next.js 16.
+式場での最終確認に使える時間が前日の数分間に限られているため、当日の通信トラブルで余興を止めないことを重視して開発しています。事前に必要な画面・画像・音声を読み込むことで、通信が利用できない状況でも抽選を継続できるようにしています。
+
+## できること
+
+- 導入画面から遊び方の案内、抽選、結果確認までを一連の流れで操作できる
+- 48種類のアクキーから当選デザインを抽選し、確定済みの当選デザインは以後の抽選対象から除外する
+- 3回の抽選結果をブラウザ内に保存し、再読み込み後も復元する
+- 各回の結果を取り消して引き直す、または全結果をリセットして最初からやり直す
+- 画像・音声・主要画面をキャッシュし、事前準備後はオフラインでも抽選を進められる
+
+## 利用の流れ
+
+1. トップ画面で `TAP TO START` を押す
+2. 導入演出の後に表示される `GAME START` から遊び方の画面へ進む
+3. `ROULETTE START` を押して抽選画面を開く
+4. `START` と `STOP` で抽選し、結果を確認する
+5. 結果を確定する場合は `NEXT`、引き直す場合は `RETRY` を選ぶ
+6. 3人目の当選者まで決めた後、必要に応じて `はじめからやり直す` で結果をリセットする
+
+## 起動方法
+
+### 前提環境
+
+- Node.js 20.9 以上
+- pnpm
+
+### ローカルで起動する
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-The production checks are:
+起動後、ターミナルに表示されるURL（通常は `http://localhost:3000`）をブラウザで開きます。
+
+## PWA・オフライン利用について
+
+このアプリはPWAとして動作し、Service Workerを使って必要なファイルをキャッシュします。会場のネットワーク品質に依存せず余興を継続できるようにするための対策です。
+
+### オフラインの動作確認手順
+
+1. インターネットに接続した状態でアプリを開く
+2. `TAP TO START` から進み、`GAME START`、`ROULETTE START` を押して抽選画面を開く
+3. 抽選画面で `ENTER` が表示されるまで待ち、画像・音声・画面を読み込む
+4. アプリを閉じ、Wi-Fiをオフにするか機内モードにする
+5. アプリを開き直し、3回の抽選を最後まで実行できることを確認する
+
+### 注意点
+
+- 初回の利用時はオンライン接続が必要です。抽選画面を一度オンラインで開くことで、その後のオフライン利用に必要な画面資産がキャッシュされます。
+- 本番で使う端末・ブラウザ・会場の表示機器で、上記の手順を事前に確認してください。
+- 当選結果はブラウザのローカルストレージに保存されます。別の端末やブラウザには引き継がれません。
+
+## 品質確認
+
+以下の自動チェックを用意しています。
 
 ```bash
-pnpm test
-pnpm lint
-pnpm typecheck
-pnpm e2e
+pnpm test       # ロジック・コンポーネントのテスト
+pnpm lint       # コード品質の確認
+pnpm typecheck  # TypeScriptの型検査
+pnpm e2e        # ブラウザ上での操作確認
 ```
 
-`pnpm e2e` starts a local Next.js server and runs Chromium. Set
-`WEDDING_ROULETTE_NODE` to the absolute path of a Node 20+ binary when the
-default `node` is older.
+`pnpm e2e` はローカルのNext.jsサーバーを起動してChromiumで実行します。既定の `node` が古い場合は、Node.js 20以上の実行ファイルを環境変数 `WEDDING_ROULETTE_NODE` に絶対パスで指定してください。
 
-## PWA and offline operation
+自動チェックに加え、オフライン状態での抽選、再読み込み後の結果復元、引き直し、全結果のリセットを当日の端末で確認することを想定しています。詳細な確認項目は [受け入れ確認リスト](docs/acceptance-checklist.md) を参照してください。
 
-`/` begins with a TAP TO START image so the hero video and its retro BGM can
-start together with a browser-approved user gesture. Once the introduction
-completes or cannot play, its GAME START image enters the draw route at
-`/roulette`.
+## 開発で意識したこと
 
-The app registers `/sw.js`, precaches both route documents, the hero video,
-TAP TO START and GAME START images, intro BGM, app shell, local icons, all 48
-keychain images, and the three roulette audio paths. Static same-origin
-requests are cached at runtime as well. Offline replay of `/roulette` is
-supported after entering that route online once, which warms its Next.js route
-assets; a first-ever offline visit to `/roulette` is not supported. No
-production asset is loaded from an external URL.
+本アプリでは、AI支援を単なる実装速度の向上に留めず、要件・制約・受け入れ条件を先に整理してから実装する進め方を採用しました。特に、会場での確認時間が限られること、オフラインでも抽選を継続すること、同じ当選デザインを出さないことを重要な制約として扱っています。
 
-For the release rehearsal, open the entry route online, press TAP TO START,
-wait for GAME START, enter the draw route, wait for `ENTER` to warm it, close
-it, disable Wi-Fi, reopen the installed PWA, and complete all three rounds. The
-browser Application panel should show the service worker as activated and the
-hero media, draw route, and all audio files as cached.
+主要な変更では、設計メモと実装計画を残し、実装後はテストと実際の操作手順で確認しています。AIの提案をそのまま採用するのではなく、必要な前提情報をコンテキストとして与え、出力を受け入れ条件と照らし合わせて確認することで、意図とのずれや手戻りを抑えました。設計・計画の記録は [docs/superpowers](docs/superpowers) にあります。
 
-## Resetting rehearsal data
+## 技術概要
 
-After STOP in any round, press `RETRY` to discard only that round's result
-and immediately spin again. Earlier results remain unchanged; the discarded
-design becomes eligible again. `NEXT` accepts the result and advances as before.
-The cancelled result is also removed from saved history, including if the page
-is reloaded during the retry. A save failure keeps the result and allows retrying.
+- Next.js 16 / React 19 / TypeScript
+- PWA（Service Workerによるキャッシュ）
+- ブラウザのローカルストレージによる抽選結果の保存
+- Playwright、Vitestによる自動テスト
+- 本番用の画像・音声はすべてアプリ内のローカルファイルを使用
 
-After the third result, press `NEXT`, then `はじめからやり直す`. Confirm the
-dialog to clear the saved winners and return to `ENTER`; all 48 designs become
-eligible again. Cancel leaves the results intact. If saved history cannot be
-cleared, an error is shown and the results remain available for another attempt.
+## 補足
 
-For a reset before completing all three rounds, open `/roulette?reset=1` and confirm
-the same dialog. The query parameter is removed from the address bar afterward.
-
-## Transparent capsule background
-
-`Ballpit` renders 48 transparent 3D capsules, each containing a different final
-keychain image. The background adapts the supplied React Bits Ballpit's sphere
-collisions and wall bounce, with glass-shell rendering and an image inside each
-ball. Gravity is `0`: capsules drift gently in both directions rather than falling,
-and retain a small minimum speed so they keep floating without pointer input.
-Capsules and their artwork are enlarged to `1.5` times the initial size, including
-the static fallback. These values are in `src/features/roulette/ballpit/settings.ts`.
-The simulation has extra depth so all 48 enlarged capsules can pass each other
-instead of jamming on narrow portrait screens.
-It is independent of the random draw and never removes already-won
-designs from the decorative background. Pointer motion and taps nudge capsules without
-blocking buttons, touch scrolling or the history dialog.
-
-Three.js loads locally on the client; no remote textures or environment maps are
-needed. In-memory textures are resized to 256px wide and device pixel ratio is
-capped at 1.5 to reduce GPU memory use. Original PNG files remain unchanged.
-Animation pauses for reduced-motion preferences or a hidden tab. If WebGL is
-unavailable or loses its context, the 48 static CSS capsules remain as a fallback
-and the WebGL resources are disposed immediately on terminal context loss.
-The existing roulette, RETRY and full reset controls are unchanged.
-
-See [React Bits attribution and license](docs/react-bits-license.md).
-
-## Asset contract
-
-The roulette domain uses local, internal asset paths only. The application uses 48 keychain entries whose `imageSrc` values follow this contract:
-
-- Base path: `/assets/keychains`
-- File pattern: `/assets/keychains/keychain-01.png` through `/assets/keychains/keychain-48.png`
-- Source mapping: `アセット 1.png` → `keychain-01.png`, through `アセット 48.png` → `keychain-48.png`.
-
-The keychain IDs are internal identifiers only and are not meant to be displayed in the UI.
-
-The PNGs are the 48 supplied final transparent designs, copied without image
-conversion. STOP selects randomly from designs that have not already won.
-The final-image release uses a new history storage key (`wedding-akkey-roulette:v2`)
-so placeholder rehearsal results are not reused; the old stored data is left intact.
-The roulette sound uses the local 90-second drum
-roll asset so it can play once without an audible loop seam.
-
-See [docs/acceptance-checklist.md](docs/acceptance-checklist.md) for the final
-offline and rehearsal checklist.
+アクキーの識別子は内部処理用であり、画面には表示しません。画像は `public/assets/keychains/` 配下に48種類配置されています。
