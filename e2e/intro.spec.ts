@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("starts the muted hero video and BGM after TAP TO START, then shows instructions before the roulette", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".intro-screen")).toHaveCSS("background-color", "rgb(255, 128, 88)");
   const video = page.getByTestId("hero-video");
   const audio = page.getByTestId("intro-audio");
   const tap = page.getByRole("button", { name: "TAP TO START" });
